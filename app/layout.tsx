@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Campus Marketplace - Group Business Report",
-  description: "ตลาดนัดเด็กวิทยาลัย - Corporate Theme",
+  title: "Campus Marketplace | ตลาดนัดนักศึกษา",
+  description: "แหล่งซื้อขายอุปกรณ์การเรียน และของใช้ในวิทยาลัย",
 };
 
 export default function RootLayout({
@@ -13,9 +12,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" suppressHydrationWarning>
-      <body className="bg-white text-black font-sans antialiased">
-        <Providers>{children}</Providers>
+    <html lang="th">
+      <body className="bg-slate-50 text-slate-900 antialiased">
+        {children}
       </body>
     </html>
   );

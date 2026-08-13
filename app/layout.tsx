@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Campus Marketplace | ตลาดนัดนักศึกษา",
-  description: "แหล่งซื้อขายอุปกรณ์การเรียน และของใช้ในวิทยาลัย",
+  title: "Campus Marketplace",
+  description: "ตลาดนัดออนไลน์ชาววิทยาลัย",
 };
 
 export default function RootLayout({
@@ -12,9 +16,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
-      <body className="bg-slate-50 text-slate-900 antialiased">
-        {children}
+    <html lang="th" suppressHydrationWarning>
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

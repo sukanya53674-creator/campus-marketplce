@@ -2,68 +2,8 @@
 
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
-import {
-  Plus, Search, Sun, Moon, ShoppingBag,
-  Tag, Image as ImageIcon, CheckCircle, X
-} from 'lucide-react';
-
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  category: string;
-  seller: string;
-  image: string;
-  condition: string;
-}
-
-const INITIAL_PRODUCTS: Product[] = [
-  {
-    id: 1,
-    title: 'หนังสือเรียน Python for Beginners',
-    price: 180,
-    category: 'หนังสือ',
-    seller: 'กิตติพงษ์ (เทคโนโลยีสารสนเทศ ปี 2)',
-    image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=400',
-    condition: 'สภาพ 95% ไม่มีรอยขีดเขียน'
-  },
-  {
-    id: 2,
-    title: 'iPad Air 4 64GB Wi-Fi + Apple Pencil 2',
-    price: 12500,
-    category: 'ไอที & ไอที',
-    seller: 'ณิชา (การบัญชี ปี 3)',
-    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&q=80&w=400',
-    condition: 'ติดฟิล์มกระดาษพร้อมใช้งาน'
-  },
-  {
-    id: 3,
-    title: 'เสื้อช็อปช่างไฟฟ้า ไซส์ L',
-    price: 250,
-    category: 'เครื่องแต่งกาย',
-    seller: 'อนันต์ (ช่างไฟฟ้า ปี 1)',
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=400',
-    condition: 'มือสอง ใส่ไป 3 ครั้ง'
-  },
-  {
-    id: 4,
-    title: 'พัดลมตั้งโต๊ะ Hatari 16 นิ้ว',
-    price: 320,
-    category: 'ของใช้เด็กหอ',
-    seller: 'เมธาวี (หอพักชาย 2)',
-    image: 'https://images.unsplash.com/photo-1618941723631-f2f54070a969?auto=format&fit=crop&q=80&w=400',
-    condition: 'ใช้งานได้ปกติ เย็นฉ่ำ'
-  },
-  {
-    id: 5,
-    title: 'เครื่องคิดเลขวิทยาศาสตร์ Casio FX-991EX',
-    price: 450,
-    category: 'อุปกรณ์การเรียน',
-    seller: 'พิชญ์ (วิศวกรรมศาสตร์ ปี 4)',
-    image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&q=80&w=400',
-    condition: 'ถ่านใหม่ เพิ่งเปลี่ยน'
-  }
-];
+import { Plus, Search, Sun, Moon, ShoppingBag, X } from 'lucide-react';
+import { Product, INITIAL_PRODUCTS } from './product';
 
 export default function HomePage() {
   const { theme, setTheme } = useTheme();
@@ -94,7 +34,6 @@ export default function HomePage() {
 
     setProducts([newProd, ...products]);
     setIsModalOpen(false);
-    // Reset Form
     setNewTitle('');
     setNewPrice('');
     setNewSeller('');
@@ -108,7 +47,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 pb-20">
-      
       {/* Header */}
       <header className="sticky top-0 z-30 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 px-4 py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
@@ -125,7 +63,6 @@ export default function HomePage() {
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-            aria-label="Toggle Theme"
           >
             {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
           </button>
@@ -134,7 +71,6 @@ export default function HomePage() {
 
       {/* Main Container */}
       <main className="max-w-md mx-auto p-4 space-y-4">
-        
         {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -147,7 +83,7 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Sell Banner Button */}
+        {/* Banner */}
         <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-4 text-white shadow-md flex items-center justify-between">
           <div>
             <h2 className="font-bold text-base">มีของไม่ได้ใช้ใช่ไหม?</h2>
@@ -161,15 +97,13 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* Section Title */}
+        {/* Product List */}
         <div className="flex items-center justify-between pt-2">
           <h3 className="font-bold text-sm text-slate-700 dark:text-slate-300">
             สินค้าล่าสุด ({filteredProducts.length})
           </h3>
-          <span className="text-xs text-indigo-500 font-medium">ดูทั้งหมด</span>
         </div>
 
-        {/* Product Cards Grid */}
         <div className="grid grid-cols-1 gap-3">
           {filteredProducts.map((product) => (
             <div
@@ -189,7 +123,7 @@ export default function HomePage() {
                   <h4 className="font-semibold text-sm line-clamp-1">{product.title}</h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{product.condition}</p>
                 </div>
-                
+
                 <div className="flex items-end justify-between mt-2 pt-1 border-t border-slate-100 dark:border-slate-800/60">
                   <span className="font-extrabold text-base text-indigo-600 dark:text-indigo-400">
                     ฿{product.price.toLocaleString()}
@@ -204,25 +138,21 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* Floating Action Button (Mobile) */}
+      {/* Floating Action Button */}
       <button
         onClick={() => setIsModalOpen(true)}
         className="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-lg shadow-indigo-600/40 flex items-center justify-center hover:bg-indigo-500 active:scale-95 transition z-20"
-        aria-label="Add Product"
       >
         <Plus className="w-7 h-7" />
       </button>
 
       {/* Add Product Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
               <h3 className="font-bold text-lg">ลงประกาศขายสินค้า</h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-              >
+              <button onClick={() => setIsModalOpen(false)} className="p-1 text-slate-400">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -236,7 +166,7 @@ export default function HomePage() {
                   placeholder="เช่น หนังสือเรียน, เสื้อช็อป"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
                 />
               </div>
 
@@ -249,7 +179,7 @@ export default function HomePage() {
                     placeholder="0"
                     value={newPrice}
                     onChange={(e) => setNewPrice(e.target.value)}
-                    className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
                   />
                 </div>
                 <div>
@@ -257,7 +187,7 @@ export default function HomePage() {
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
                   >
                     <option value="หนังสือ">หนังสือ</option>
                     <option value="อุปกรณ์การเรียน">อุปกรณ์การเรียน</option>
@@ -276,7 +206,7 @@ export default function HomePage() {
                   placeholder="เช่น สมชาย (คอมพิวเตอร์ ปี 2)"
                   value={newSeller}
                   onChange={(e) => setNewSeller(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
                 />
               </div>
 
@@ -287,7 +217,7 @@ export default function HomePage() {
                   placeholder="เช่น สภาพ 90%, ใช้งานปกติ"
                   value={newCondition}
                   onChange={(e) => setNewCondition(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
                 />
               </div>
 

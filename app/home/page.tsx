@@ -1,236 +1,183 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useTheme } from 'next-themes';
-import { Plus, Search, Sun, Moon, ShoppingBag, X } from 'lucide-react';
-import { Product, INITIAL_PRODUCTS } from './product';
+import React, { useState } from "react";
 
-export default function HomePage() {
-  const { theme, setTheme } = useTheme();
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [search, setSearch] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+// ข้อมูลจำลองสินค้า
+const PRODUCTS = [
+  {
+    id: 1,
+    title: "หนังสือการเขียนโปรแกรม Next.js & React",
+    price: 250,
+    category: "หนังสือเรียน",
+    location: "ตึกวิศวกรรมศาสตร์",
+    image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500&q=80",
+    condition: "มือสอง (สภาพ 95%)",
+  },
+  {
+    id: 2,
+    title: "หูฟังไร้สาย Bluetooth Noise Cancelling",
+    price: 590,
+    category: "อุปกรณ์ IT",
+    location: "หอพักชาย 2",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+    condition: "มือสอง (สภาพดี)",
+  },
+  {
+    id: 3,
+    title: "เสื้อช็อปคณะวิศวะ ไซส์ L",
+    price: 180,
+    category: "เสื้อผ้า / ยูนิฟอร์ม",
+    location: "ลานเกียร์",
+    image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80",
+    condition: "มือสอง",
+  },
+  {
+    id: 4,
+    title: "พัดลมตั้งโต๊ะขนาดเล็ก เหมาะติดหอพัก",
+    price: 120,
+    category: "ของใช้หอพัก",
+    location: "หอพักหญิง 1",
+    image: "https://images.unsplash.com/photo-1618961734760-466979ce35b0?w=500&q=80",
+    condition: "มือสอง (ใช้งานได้ปกติ)",
+  },
+];
 
-  // Form States
-  const [newTitle, setNewTitle] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-  const [newCategory, setNewCategory] = useState('อุปกรณ์การเรียน');
-  const [newSeller, setNewSeller] = useState('');
-  const [newCondition, setNewCondition] = useState('');
+const CATEGORIES = ["ทั้งหมด", "หนังสือเรียน", "อุปกรณ์ IT", "เสื้อผ้า / ยูนิฟอร์ม", "ของใช้หอพัก"];
 
-  const handleAddProduct = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle || !newPrice || !newSeller) return;
+export default function Home() {
+  const [selectedCategory, setSelectedCategory] = useState("ทั้งหมด");
+  const [searchTerm, setSearchTerm] = useState("");
 
-    const newProd: Product = {
-      id: Date.now(),
-      title: newTitle,
-      price: Number(newPrice),
-      category: newCategory,
-      seller: newSeller,
-      condition: newCondition || 'สภาพดี',
-      image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&q=80&w=400'
-    };
-
-    setProducts([newProd, ...products]);
-    setIsModalOpen(false);
-    setNewTitle('');
-    setNewPrice('');
-    setNewSeller('');
-    setNewCondition('');
-  };
-
-  const filteredProducts = products.filter(p =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.category.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProducts = PRODUCTS.filter((item) => {
+    const matchCategory = selectedCategory === "ทั้งหมด" || item.category === selectedCategory;
+    const matchSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchCategory && matchSearch;
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-30 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 px-4 py-3">
-        <div className="max-w-md mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-slate-50 text-slate-800">
+      {/* 1. HEADER / NAVBAR */}
+      <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-600 rounded-xl text-white">
-              <ShoppingBag className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="font-bold text-base leading-tight">Campus Market</h1>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">ตลาดนัดเด็กวิทยาลัย</p>
-            </div>
+            <span className="text-2xl">🛒</span>
+            <h1 className="text-xl font-bold text-blue-600 tracking-tight">Campus Marketplace</h1>
           </div>
 
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
-          >
-            {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
-          </button>
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md">
+            <input
+              type="text"
+              placeholder="ค้นหาสินค้า เช่น หนังสือ, พัดลม..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 text-sm bg-slate-100 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3">
+            <button className="hidden sm:inline-flex bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm">
+              + ลงขายสินค้า
+            </button>
+            <button className="p-2 text-slate-600 hover:text-blue-600">👤 เข้าสู่ระบบ</button>
+          </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-md mx-auto p-4 space-y-4">
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="ค้นหาสินค้า เช่น หนังสือ, พัดลม..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
-          />
-        </div>
-
-        {/* Banner */}
-        <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-4 text-white shadow-md flex items-center justify-between">
-          <div>
-            <h2 className="font-bold text-base">มีของไม่ได้ใช้ใช่ไหม?</h2>
-            <p className="text-xs text-indigo-100 mt-0.5">ลงขายให้เพื่อนร่วมวิทยาลัยได้เลยง่ายๆ</p>
+      {/* MAIN CONTENT AREA */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 2. HERO BANNER */}
+        <section className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 sm:p-10 text-white mb-8 shadow-md">
+          <div className="max-w-2xl">
+            <span className="bg-blue-500/30 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full border border-blue-400/30">
+              วิทยาลัยของเรา
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold mt-3 mb-2">
+              ตลาดนัดซื้อ-ขาย ของนักศึกษา
+            </h2>
+            <p className="text-blue-100 text-sm sm:text-base mb-6">
+              ส่งต่อหนังสือ อุปกรณ์การเรียน และของใช้หอพักในราคามิตรภาพ นัดรับได้ง่ายๆ ในเขตรั้ววิทยาลัย
+            </p>
+            <button className="bg-white text-blue-700 font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-blue-50 transition-colors shadow">
+              สำรวจสินค้าทั้งหมด
+            </button>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-3.5 py-2 bg-white text-indigo-600 font-semibold text-xs rounded-xl shadow-sm flex items-center gap-1 active:scale-95 transition"
-          >
-            <Plus className="w-4 h-4" /> ลงขายเลย
-          </button>
-        </div>
+        </section>
 
-        {/* Product List */}
-        <div className="flex items-center justify-between pt-2">
-          <h3 className="font-bold text-sm text-slate-700 dark:text-slate-300">
-            สินค้าล่าสุด ({filteredProducts.length})
-          </h3>
-        </div>
+        {/* 3. CATEGORY FILTERS */}
+        <section className="mb-8">
+          <h3 className="text-lg font-bold text-slate-900 mb-4">หมวดหมู่สินค้า</h3>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedCategory === cat
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </section>
 
-        <div className="grid grid-cols-1 gap-3">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-3 flex gap-3 shadow-sm hover:shadow-md transition"
-            >
-              <img
-                src={product.image}
-                alt={product.title}
-                className="w-24 h-24 rounded-xl object-cover flex-shrink-0 bg-slate-100 dark:bg-slate-800"
-              />
-              <div className="flex flex-col justify-between flex-1 min-w-0">
-                <div>
-                  <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-md mb-1">
-                    {product.category}
+        {/* 4. PRODUCT GRID */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-slate-900">
+              รายการสินค้า ({filteredProducts.length})
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
+              >
+                <div className="relative h-48 bg-slate-100">
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-2 left-2 bg-slate-900/70 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-md">
+                    {product.condition}
                   </span>
-                  <h4 className="font-semibold text-sm line-clamp-1">{product.title}</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{product.condition}</p>
                 </div>
-
-                <div className="flex items-end justify-between mt-2 pt-1 border-t border-slate-100 dark:border-slate-800/60">
-                  <span className="font-extrabold text-base text-indigo-600 dark:text-indigo-400">
-                    ฿{product.price.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-slate-400 truncate max-w-[120px]">
-                    {product.seller}
-                  </span>
+                <div className="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <span className="text-xs font-semibold text-blue-600">{product.category}</span>
+                    <h4 className="font-semibold text-slate-900 line-clamp-2 mt-1 mb-2">
+                      {product.title}
+                    </h4>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 mb-2">📍 นัดรับ: {product.location}</p>
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                      <span className="text-lg font-bold text-blue-600">฿{product.price}</span>
+                      <button className="text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 font-medium px-3 py-1.5 rounded-md transition-colors">
+                        ทักแชท
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </section>
       </main>
 
-      {/* Floating Action Button */}
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-lg shadow-indigo-600/40 flex items-center justify-center hover:bg-indigo-500 active:scale-95 transition z-20"
-      >
-        <Plus className="w-7 h-7" />
-      </button>
-
-      {/* Add Product Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="font-bold text-lg">ลงประกาศขายสินค้า</h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-1 text-slate-400">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddProduct} className="space-y-4 mt-4">
-              <div>
-                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">ชื่อสินค้า *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="เช่น หนังสือเรียน, เสื้อช็อป"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">ราคา (บาท) *</label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="0"
-                    value={newPrice}
-                    onChange={(e) => setNewPrice(e.target.value)}
-                    className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">หมวดหมู่</label>
-                  <select
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
-                  >
-                    <option value="หนังสือ">หนังสือ</option>
-                    <option value="อุปกรณ์การเรียน">อุปกรณ์การเรียน</option>
-                    <option value="เครื่องแต่งกาย">เครื่องแต่งกาย</option>
-                    <option value="ไอที & ไอที">ไอที & ไอที</option>
-                    <option value="ของใช้เด็กหอ">ของใช้เด็กหอ</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">ผู้ขาย (ชื่อ + แผนก/ชั้นปี) *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="เช่น สมชาย (คอมพิวเตอร์ ปี 2)"
-                  value={newSeller}
-                  onChange={(e) => setNewSeller(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">รายละเอียดสภาพสินค้า</label>
-                <input
-                  type="text"
-                  placeholder="เช่น สภาพ 90%, ใช้งานปกติ"
-                  value={newCondition}
-                  onChange={(e) => setNewCondition(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-500 transition active:scale-95 mt-2"
-              >
-                บันทึกประกาศ
-              </button>
-            </form>
-          </div>
+      {/* 5. FOOTER */}
+      <footer className="bg-white border-t border-slate-200 mt-16 py-8">
+        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+          <p>© 2026 Campus Marketplace — ระบบตลาดนัดนักศึกษาเพื่อชุมชนวิทยาลัย</p>
         </div>
-      )}
+      </footer>
     </div>
   );
 }

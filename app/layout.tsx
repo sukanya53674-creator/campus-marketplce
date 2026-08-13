@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import "./globals.css";
 import { Providers } from "./providers";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Campus Marketplace",
-  description: "ตลาดนัดเด็กวิทยาลัย",
+  title: "Campus Marketplace - Group Business Report",
+  description: "ตลาดนัดเด็กวิทยาลัย - Corporate Theme",
 };
 
 export default function RootLayout({
@@ -16,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className="bg-white text-black font-sans antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

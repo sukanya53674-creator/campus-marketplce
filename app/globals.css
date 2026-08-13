@@ -1,41 +1,8 @@
-@import url('https://font.sec.miui.com/font/css?family=MiSans:400,600,700:latin,chinese');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* บังคับห้ามใช้ฟอนต์อื่นนอกจาก MiSans */
-  html, body {
-    font-family: 'MiSans', sans-serif !important;
-    background-color: #FFFFFF;
-    color: #000000;
-    max-width: 100vw;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-}
-
-/* ระยะปลอดภัยขอบซ้าย-ขวา 0.53in (~0.53 นิ้ว = 51px) ตามกฎ */
-.container-safety-margin {
-  padding-left: 0.53in;
-  padding-right: 0.53in;
-}
-
-/* ระยะปลอดภัยขอบล่าง Footer 0.55in */
-.footer-safety-zone {
-  padding-bottom: 0.55in;
-}
-
-/* กฎห้ามใส่เงา/เอฟเฟกต์ประดิดประดอย */
-.no-decorations {
-  box-shadow: none !important;
-  text-shadow: none !important;
-  filter: none !important;
+body {
+  background-color: #0b1329;
+  color: #ffffff;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 interface Product {
   id: number;
@@ -73,7 +73,7 @@ export default function HomePage() {
 
   // 3D Interactive State Controls
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [rotX, setRotX] = useState(10);
+  const [rotX, setRotX] = useState(12);
   const [rotY, setRotY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -84,7 +84,7 @@ export default function HomePage() {
     let interval: NodeJS.Timeout;
     if (selectedProduct && isAutoRotate && !isDragging) {
       interval = setInterval(() => {
-        setRotY((prev) => (prev + 1.5) % 360);
+        setRotY((prev) => (prev + 1.8) % 360);
       }, 30);
     }
     return () => clearInterval(interval);
@@ -107,8 +107,8 @@ export default function HomePage() {
     const deltaX = clientX - startPos.x;
     const deltaY = clientY - startPos.y;
 
-    setRotY((prev) => prev + deltaX * 0.8);
-    setRotX((prev) => Math.max(-30, Math.min(30, prev - deltaY * 0.5)));
+    setRotY((prev) => prev + deltaX * 0.9);
+    setRotX((prev) => Math.max(-30, Math.min(35, prev - deltaY * 0.5)));
 
     setStartPos({ x: clientX, y: clientY });
   };
@@ -251,16 +251,16 @@ export default function HomePage() {
               display: "inline-block",
               marginBottom: "14px"
             }}>
-              ✨ Interactive 3D Orbit Experience
+              ✨ Borderless 3D Object Preview
             </span>
             <h2 style={{ fontSize: "24px", fontWeight: "900", margin: "0 0 10px 0", color: "#ffffff", lineHeight: "1.2" }}>
-              กดที่สินค้าเพื่อดูโมเดลลอย <br />
+              กดสินค้าเพื่อดูโมเดลลอย <br />
               <span style={{ background: "linear-gradient(to right, #a5b4fc, #f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                และใช้เมาส์คลิกลากหมุน 360°
+                โชว์เฉพาะตัวสินค้าแบบ 3D อิสระ
               </span>
             </h2>
             <p style={{ fontSize: "13px", color: "#e0e7ff", margin: "0 0 20px 0" }}>
-              สัมผัสประสบการณ์การเลือกซื้อสินค้ามหาลัยแบบ 3D
+              ไม่มีขอบกล่องบดบัง ลากหมุนได้ 360 องศา
             </p>
             
             <a href="/add-product" style={{
@@ -354,7 +354,7 @@ export default function HomePage() {
                 key={product.id}
                 onClick={() => {
                   setSelectedProduct(product);
-                  setRotX(10);
+                  setRotX(12);
                   setRotY(0);
                   setIsAutoRotate(true);
                 }}
@@ -453,7 +453,7 @@ export default function HomePage() {
 
       </main>
 
-      {/* 3D FLOATING & ROTATING PRODUCT MODAL */}
+      {/* 3D PURE OBJECT FLOATING MODAL (โชว์เฉพาะตัวสินค้าลอยลอย) */}
       {selectedProduct && (
         <div style={{
           position: "fixed",
@@ -513,11 +513,11 @@ export default function HomePage() {
                 fontWeight: "bold",
                 border: "1px solid rgba(129, 140, 248, 0.3)"
               }}>
-                👆 คลิกค้างแล้วลากเพื่อหมุน 3D อิสระ
+                👆 คลิกค้างแล้วลากเพื่อหมุนโมเดล 3D
               </span>
             </div>
 
-            {/* 3D Floating Stage */}
+            {/* Pure 3D Floating Stage (ไม่มีกรอบกล่องพื้นหลังรูป) */}
             <div 
               onMouseDown={handleMouseDown}
               onTouchStart={handleMouseDown}
@@ -532,41 +532,42 @@ export default function HomePage() {
                 margin: "10px 0"
               }}
             >
-              {/* Floating Shadow */}
+              {/* Dynamic Bottom Radial Glow & Shadow */}
               <div style={{
                 position: "absolute",
-                bottom: "10px",
-                width: "160px",
-                height: "20px",
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                bottom: "15px",
+                width: "140px",
+                height: "25px",
+                background: "radial-gradient(ellipse at center, rgba(99, 102, 241, 0.6) 0%, rgba(0,0,0,0) 70%)",
                 borderRadius: "50%",
-                filter: "blur(10px)",
-                transform: `scale(${1 - Math.sin((rotY * Math.PI) / 180) * 0.15})`,
+                filter: "blur(8px)",
+                transform: `scale(${1 - Math.sin((rotY * Math.PI) / 180) * 0.2})`,
                 transition: isDragging ? "none" : "transform 0.1s"
               }} />
 
-              {/* 3D Floating Object Card */}
+              {/* ISOLATED 3D MODEL (ตัดกรอบ ถอดสีพื้นหลัง โชว์ลอยๆ) */}
               <div style={{
-                width: "210px",
+                width: "180px",
                 height: "180px",
-                borderRadius: "24px",
-                boxShadow: "0 25px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.5)",
                 transformStyle: "preserve-3d",
-                transform: `translateY(-15px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+                transform: `translateY(-18px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
                 transition: isDragging ? "none" : "transform 0.1s linear",
                 position: "relative",
-                overflow: "hidden",
-                border: "2px solid rgba(129, 140, 248, 0.6)",
-                backgroundColor: "#000"
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                filter: "drop-shadow(0 20px 25px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 20px rgba(99, 102, 241, 0.4))"
               }}>
                 <img
                   src={selectedProduct.image}
                   alt={selectedProduct.title}
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    pointerEvents: "none"
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "contain",
+                    pointerEvents: "none",
+                    mixBlendMode: "screen", // เคลียร์ฉากหลังรูปให้เนียนลอยลอย
+                    borderRadius: "16px"
                   }}
                 />
               </div>

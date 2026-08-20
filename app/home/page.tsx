@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Product {
   id: number;
@@ -41,8 +41,8 @@ const sampleProducts: Product[] = [
     category: "เสื้อผ้า",
     seller: "พลอย บัญชี",
     condition: "มือสองสภาพนางฟ้า",
-    image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500&q=80",
     description: "เสื้อแจ็กเก็ตผ้านุ่ม ใส่เข้าห้องเลกเชอร์แอร์เย็นๆ กำลังพอดี ซักอบรีดคลีนเรียบร้อยแล้วค่ะ",
+    image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500&q=80",
   },
   {
     id: 4,
@@ -70,22 +70,52 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState("home");
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  
-  // 3D Product Detail Modal State
+
+  // 3D Interactive State Controls
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [rotationY, setRotationY] = useState(0);
+  const [rotX, setRotX] = useState(10);
+  const [rotY, setRotY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [isAutoRotate, setIsAutoRotate] = useState(true);
 
-  // Auto Rotation effect for 3D Product View
+  // Auto Rotation effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (selectedProduct && isAutoRotate) {
+    if (selectedProduct && isAutoRotate && !isDragging) {
       interval = setInterval(() => {
-        setRotationY((prev) => (prev + 2) % 360);
+        setRotY((prev) => (prev + 1.5) % 360);
       }, 30);
     }
     return () => clearInterval(interval);
-  }, [selectedProduct, isAutoRotate]);
+  }, [selectedProduct, isAutoRotate, isDragging]);
+
+  // Drag Handlers for 3D Control
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    setIsDragging(true);
+    setIsAutoRotate(false);
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    setStartPos({ x: clientX, y: clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDragging) return;
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    
+    const deltaX = clientX - startPos.x;
+    const deltaY = clientY - startPos.y;
+
+    setRotY((prev) => prev + deltaX * 0.8);
+    setRotX((prev) => Math.max(-30, Math.min(30, prev - deltaY * 0.5)));
+
+    setStartPos({ x: clientX, y: clientY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   const filteredProducts = sampleProducts.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -97,7 +127,7 @@ export default function HomePage() {
     bg: isDarkMode ? "#05070e" : "#f1f5f9",
     text: isDarkMode ? "#f1f5f9" : "#0f172a",
     subText: isDarkMode ? "#94a3b8" : "#64748b",
-    cardBg: isDarkMode ? "rgba(15, 23, 42, 0.75)" : "rgba(255, 255, 255, 0.8)",
+    cardBg: isDarkMode ? "rgba(15, 23, 42, 0.85)" : "rgba(255, 255, 255, 0.9)",
     border: isDarkMode ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
     dockBg: isDarkMode ? "rgba(15, 23, 42, 0.85)" : "rgba(255, 255, 255, 0.85)",
     shadow: isDarkMode ? "rgba(0, 0, 0, 0.6)" : "rgba(148, 163, 184, 0.3)",
@@ -105,18 +135,25 @@ export default function HomePage() {
   };
 
   return (
-    <div style={{
-      backgroundColor: theme.bg,
-      color: theme.text,
-      minHeight: "100vh",
-      fontFamily: "system-ui, -apple-system, sans-serif",
-      paddingBottom: "110px",
-      position: "relative",
-      overflowX: "hidden",
-      transition: "background-color 0.3s ease, color 0.3s ease"
-    }}>
+    <div 
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onTouchEnd={handleMouseUp}
+      style={{
+        backgroundColor: theme.bg,
+        color: theme.text,
+        minHeight: "100vh",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        paddingBottom: "110px",
+        position: "relative",
+        overflowX: "hidden",
+        transition: "background-color 0.3s ease, color 0.3s ease",
+        userSelect: isDragging ? "none" : "auto"
+      }}
+    >
       
-      {/* Container */}
+      {/* Main Container */}
       <main style={{ maxWidth: "640px", margin: "0 auto", padding: "20px 16px", position: "relative", zIndex: 2 }}>
         
         {/* Header */}
@@ -151,7 +188,7 @@ export default function HomePage() {
               <h1 style={{ margin: 0, fontSize: "20px", fontWeight: "900", background: "linear-gradient(to right, #6366f1, #ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 CampusHub 3D
               </h1>
-              <p style={{ margin: 0, fontSize: "11px", color: theme.subText }}>3D Immersive Marketplace</p>
+              <p style={{ margin: 0, fontSize: "11px", color: theme.subText }}>3D Floating Marketplace</p>
             </div>
           </div>
 
@@ -214,16 +251,16 @@ export default function HomePage() {
               display: "inline-block",
               marginBottom: "14px"
             }}>
-              ✨ 3D INTERACTIVE EXPERIENCE
+              ✨ Interactive 3D Orbit Experience
             </span>
             <h2 style={{ fontSize: "24px", fontWeight: "900", margin: "0 0 10px 0", color: "#ffffff", lineHeight: "1.2" }}>
-              ส่งต่อของไม่ได้ใช้ <br />
+              กดที่สินค้าเพื่อดูโมเดลลอย <br />
               <span style={{ background: "linear-gradient(to right, #a5b4fc, #f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                กดดูสินค้าหมุน 3D ได้สมจริง
+                และใช้เมาส์คลิกลากหมุน 360°
               </span>
             </h2>
             <p style={{ fontSize: "13px", color: "#e0e7ff", margin: "0 0 20px 0" }}>
-              คลิกที่สินค้าเพื่อเปิดหน้าต่างแสดงผลหมุน 3D
+              สัมผัสประสบการณ์การเลือกซื้อสินค้ามหาลัยแบบ 3D
             </p>
             
             <a href="/add-product" style={{
@@ -299,7 +336,7 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* PRODUCT GRID */}
+        {/* Product Grid */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
           <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "900", color: theme.text }}>🔥 สินค้ามาใหม่ล่าสุด</h3>
           <span style={{ fontSize: "12px", color: theme.subText, fontWeight: "bold" }}>{filteredProducts.length} รายการ</span>
@@ -317,7 +354,8 @@ export default function HomePage() {
                 key={product.id}
                 onClick={() => {
                   setSelectedProduct(product);
-                  setRotationY(0);
+                  setRotX(10);
+                  setRotY(0);
                   setIsAutoRotate(true);
                 }}
                 onMouseEnter={() => setHoveredCard(product.id)}
@@ -338,7 +376,6 @@ export default function HomePage() {
                   cursor: "pointer"
                 }}
               >
-                {/* 3D FLOATING IMAGE CONTAINER */}
                 <div style={{
                   position: "relative",
                   height: "140px",
@@ -416,7 +453,7 @@ export default function HomePage() {
 
       </main>
 
-      {/* 3D PRODUCT VIEW MODAL (หน้าต่างลอยแสดงสินค้าหมุน 3D) */}
+      {/* 3D FLOATING & ROTATING PRODUCT MODAL */}
       {selectedProduct && (
         <div style={{
           position: "fixed",
@@ -424,8 +461,8 @@ export default function HomePage() {
           left: 0,
           width: "100vw",
           height: "100vh",
-          backgroundColor: "rgba(5, 7, 14, 0.85)",
-          backdropFilter: "blur(20px)",
+          backgroundColor: "rgba(5, 7, 14, 0.88)",
+          backdropFilter: "blur(24px)",
           zIndex: 999,
           display: "flex",
           justifyContent: "center",
@@ -437,10 +474,10 @@ export default function HomePage() {
             backgroundColor: theme.cardBg,
             border: `1px solid ${theme.border}`,
             borderRadius: "32px",
-            padding: "28px",
+            padding: "24px",
             maxWidth: "480px",
             width: "100%",
-            boxShadow: "0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.3)",
+            boxShadow: "0 30px 60px rgba(0, 0, 0, 0.8), 0 0 50px rgba(99, 102, 241, 0.35)",
             position: "relative"
           }}>
             {/* Close Button */}
@@ -458,34 +495,69 @@ export default function HomePage() {
                 height: "36px",
                 cursor: "pointer",
                 fontWeight: "bold",
-                fontSize: "16px"
+                fontSize: "16px",
+                zIndex: 10
               }}
             >
               ✕
             </button>
 
-            {/* 3D Interactive Stage */}
-            <div style={{
-              perspective: "1000px",
-              height: "220px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              margin: "10px 0 20px 0",
-              position: "relative"
-            }}>
-              {/* 3D Floating & Rotating Card */}
+            {/* Hint Badge */}
+            <div style={{ textAlign: "center", marginBottom: "10px" }}>
+              <span style={{
+                backgroundColor: "rgba(99, 102, 241, 0.2)",
+                color: "#818cf8",
+                fontSize: "11px",
+                padding: "4px 12px",
+                borderRadius: "12px",
+                fontWeight: "bold",
+                border: "1px solid rgba(129, 140, 248, 0.3)"
+              }}>
+                👆 คลิกค้างแล้วลากเพื่อหมุน 3D อิสระ
+              </span>
+            </div>
+
+            {/* 3D Floating Stage */}
+            <div 
+              onMouseDown={handleMouseDown}
+              onTouchStart={handleMouseDown}
+              style={{
+                perspective: "1000px",
+                height: "230px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: isDragging ? "grabbing" : "grab",
+                position: "relative",
+                margin: "10px 0"
+              }}
+            >
+              {/* Floating Shadow */}
               <div style={{
-                width: "200px",
+                position: "absolute",
+                bottom: "10px",
+                width: "160px",
+                height: "20px",
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                borderRadius: "50%",
+                filter: "blur(10px)",
+                transform: `scale(${1 - Math.sin((rotY * Math.PI) / 180) * 0.15})`,
+                transition: isDragging ? "none" : "transform 0.1s"
+              }} />
+
+              {/* 3D Floating Object Card */}
+              <div style={{
+                width: "210px",
                 height: "180px",
                 borderRadius: "24px",
-                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(99, 102, 241, 0.4)",
+                boxShadow: "0 25px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.5)",
                 transformStyle: "preserve-3d",
-                transform: `rotateY(${rotationY}deg) rotateX(10deg)`,
-                transition: isAutoRotate ? "none" : "transform 0.1s ease-out",
+                transform: `translateY(-15px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+                transition: isDragging ? "none" : "transform 0.1s linear",
                 position: "relative",
                 overflow: "hidden",
-                border: "2px solid rgba(129, 140, 248, 0.5)"
+                border: "2px solid rgba(129, 140, 248, 0.6)",
+                backgroundColor: "#000"
               }}>
                 <img
                   src={selectedProduct.image}
@@ -493,31 +565,32 @@ export default function HomePage() {
                   style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover"
+                    objectFit: "cover",
+                    pointerEvents: "none"
                   }}
                 />
               </div>
             </div>
 
-            {/* 3D Rotation Controls (หมุนซ้าย - ขวา - ออโต้) */}
-            <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
+            {/* Interactive Buttons */}
+            <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "18px" }}>
               <button
                 onClick={() => {
                   setIsAutoRotate(false);
-                  setRotationY((prev) => prev - 30);
+                  setRotY((prev) => prev - 45);
                 }}
                 style={{
                   backgroundColor: "rgba(99, 102, 241, 0.2)",
                   border: "1px solid rgba(99, 102, 241, 0.4)",
                   color: "#818cf8",
-                  padding: "8px 16px",
-                  borderRadius: "14px",
+                  padding: "6px 14px",
+                  borderRadius: "12px",
                   fontWeight: "bold",
                   cursor: "pointer",
-                  fontSize: "12px"
+                  fontSize: "11px"
                 }}
               >
-                🔄 หมุนซ้าย
+                ◀ หมุนซ้าย
               </button>
 
               <button
@@ -526,11 +599,11 @@ export default function HomePage() {
                   backgroundColor: isAutoRotate ? "#6366f1" : "rgba(255, 255, 255, 0.1)",
                   border: "none",
                   color: "#ffffff",
-                  padding: "8px 16px",
-                  borderRadius: "14px",
+                  padding: "6px 14px",
+                  borderRadius: "12px",
                   fontWeight: "bold",
                   cursor: "pointer",
-                  fontSize: "12px"
+                  fontSize: "11px"
                 }}
               >
                 {isAutoRotate ? "⏸️ หยุดหมุน" : "▶️ หมุนออโต้"}
@@ -539,38 +612,38 @@ export default function HomePage() {
               <button
                 onClick={() => {
                   setIsAutoRotate(false);
-                  setRotationY((prev) => prev + 30);
+                  setRotY((prev) => prev + 45);
                 }}
                 style={{
                   backgroundColor: "rgba(99, 102, 241, 0.2)",
                   border: "1px solid rgba(99, 102, 241, 0.4)",
                   color: "#818cf8",
-                  padding: "8px 16px",
-                  borderRadius: "14px",
+                  padding: "6px 14px",
+                  borderRadius: "12px",
                   fontWeight: "bold",
                   cursor: "pointer",
-                  fontSize: "12px"
+                  fontSize: "11px"
                 }}
               >
-                หมุนขวา 🔄
+                หมุนขวา ▶
               </button>
             </div>
 
-            {/* Product Details */}
-            <h3 style={{ fontSize: "18px", fontWeight: "900", margin: "0 0 6px 0", color: theme.text }}>
+            {/* Detail Content */}
+            <h3 style={{ fontSize: "17px", fontWeight: "900", margin: "0 0 4px 0", color: theme.text }}>
               {selectedProduct.title}
             </h3>
-            <p style={{ fontSize: "12px", color: theme.subText, margin: "0 0 12px 0" }}>
+            <p style={{ fontSize: "11px", color: theme.subText, margin: "0 0 10px 0" }}>
               📍 ผู้ขาย: {selectedProduct.seller} | สภาพ: {selectedProduct.condition}
             </p>
-            <p style={{ fontSize: "13px", color: theme.text, lineHeight: "1.5", margin: "0 0 20px 0" }}>
+            <p style={{ fontSize: "12px", color: theme.text, lineHeight: "1.5", margin: "0 0 18px 0" }}>
               {selectedProduct.description}
             </p>
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "14px", borderTop: `1px solid ${theme.border}` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "12px", borderTop: `1px solid ${theme.border}` }}>
               <div>
-                <span style={{ fontSize: "11px", color: theme.subText, display: "block" }}>ราคาขายส่งต่อ</span>
-                <span style={{ fontSize: "22px", fontWeight: "900", background: "linear-gradient(to right, #6366f1, #ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                <span style={{ fontSize: "10px", color: theme.subText, display: "block" }}>ราคาขายส่งต่อ</span>
+                <span style={{ fontSize: "20px", fontWeight: "900", background: "linear-gradient(to right, #6366f1, #ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                   ฿{selectedProduct.price.toLocaleString()}
                 </span>
               </div>
@@ -578,10 +651,10 @@ export default function HomePage() {
                 background: "linear-gradient(to right, #6366f1, #a855f7)",
                 color: "#ffffff",
                 border: "none",
-                padding: "12px 24px",
-                borderRadius: "16px",
+                padding: "10px 20px",
+                borderRadius: "14px",
                 fontWeight: "bold",
-                fontSize: "14px",
+                fontSize: "13px",
                 cursor: "pointer",
                 boxShadow: "0 10px 20px rgba(99, 102, 241, 0.4)"
               }}>
@@ -592,7 +665,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Floating Bottom Dock Navigation */}
+      {/* Floating Bottom Navigation */}
       <nav style={{
         position: "fixed",
         bottom: "20px",

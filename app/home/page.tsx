@@ -2,8 +2,16 @@
 
 import React, { useState } from "react";
 
-// ข้อมูลจำลองสินค้า
-const PRODUCTS = [
+interface Product {
+  id: number;
+  title: string;
+  price: number;
+  category: string;
+  seller: string;
+  image: string;
+}
+
+const PRODUCTS: Product[] = [
   {
     id: 1,
     title: "หนังสือเรียน Calculus 1 (สภาพ 90%)",
@@ -88,7 +96,7 @@ export default function HomePage() {
             <h2 style={{ fontSize: "18px", fontWeight: "bold", margin: "0 0 4px 0", color: "#ffffff" }}>มีของไม่ได้ใช้ไหม?</h2>
             <p style={{ fontSize: "13px", color: "#dbeafe", margin: 0 }}>นำมาลงขายให้เพื่อนๆ ในวิทยาลัยได้เลยง่ายๆ</p>
           </div>
-          <button style={{ backgroundColor: "#ffffff", color: "#0f172a", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: "bold", fontSize: "13px", cursor: "pointer", whitespace: "nowrap" }}>
+          <button style={{ backgroundColor: "#ffffff", color: "#0f172a", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: "bold", fontSize: "13px", cursor: "pointer", whiteSpace: "nowrap" }}>
             + ลงขายเลย
           </button>
         </div>
@@ -110,7 +118,7 @@ export default function HomePage() {
                 border: "1px solid #334155",
                 display: "flex",
                 flexDirection: "column",
-                justify: "space-between"
+                justifyContent: "space-between"
               }}
             >
               {/* รูปสินค้า */}
@@ -123,7 +131,7 @@ export default function HomePage() {
               </div>
 
               {/* เนื้อหาการ์ด */}
-              <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", justify: "space-between" }}>
+              <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <div>
                   <span style={{ backgroundColor: "#334155", color: "#cbd5e1", fontSize: "11px", padding: "4px 8px", borderRadius: "6px", fontWeight: "500" }}>
                     {product.category}

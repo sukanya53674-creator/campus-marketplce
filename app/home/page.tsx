@@ -9,6 +9,8 @@ interface Product {
   category: string;
   seller: string;
   image: string;
+  description: string;
+  condition: string;
 }
 
 const sampleProducts: Product[] = [
@@ -18,6 +20,8 @@ const sampleProducts: Product[] = [
     price: 180,
     category: "หนังสือ",
     seller: "ทีมอ 3",
+    condition: "สภาพดีมาก ไม่มีรอยขีดเขียน",
+    description: "หนังสือเล่มนี้ใช้เรียนแคลคูลัส 1 สภาพ 90% จิตวิญญาณคนติด A อยู่ในเล่มนี้แน่นอนครับ นัดรับหน้าลานเกียร์ได้เลย",
     image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80",
   },
   {
@@ -26,6 +30,8 @@ const sampleProducts: Product[] = [
     price: 450,
     category: "อุปกรณ์การเรียน",
     seller: "บอส วิศวะ",
+    condition: "ใช้งานปกติ สภาพ 95%",
+    description: "แรร์ไอเทม Casio รุ่นยอดฮิต คำนวณเมทริกซ์และสมการได้เร็วมาก แบตเตอรี่โซล่าเซลล์ยังใช้งานได้เต็มประสิทธิภาพ",
     image: "https://images.unsplash.com/photo-1587145820266-a5951ee6f620?w=500&q=80",
   },
   {
@@ -34,7 +40,9 @@ const sampleProducts: Product[] = [
     price: 320,
     category: "เสื้อผ้า",
     seller: "พลอย บัญชี",
+    condition: "มือสองสภาพนางฟ้า",
     image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500&q=80",
+    description: "เสื้อแจ็กเก็ตผ้านุ่ม ใส่เข้าห้องเลกเชอร์แอร์เย็นๆ กำลังพอดี ซักอบรีดคลีนเรียบร้อยแล้วค่ะ",
   },
   {
     id: 4,
@@ -42,6 +50,8 @@ const sampleProducts: Product[] = [
     price: 850,
     category: "ของใช้หอพัก",
     seller: "กอล์ฟ สถาปัตย์",
+    condition: "พร้อมใช้งาน เปลี่ยนเบรกใหม่แล้ว",
+    description: "จักรยานแม่บ้านปั่นไปเรียนสบายๆ มีตะกร้าหน้าใส่กระเป๋าเอกสารได้ ยางใหม่ ยางในเปลี่ยนใหม่หมดแล้วครับ",
     image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=500&q=80",
   },
 ];
@@ -60,6 +70,22 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState("home");
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  
+  // 3D Product Detail Modal State
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [rotationY, setRotationY] = useState(0);
+  const [isAutoRotate, setIsAutoRotate] = useState(true);
+
+  // Auto Rotation effect for 3D Product View
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (selectedProduct && isAutoRotate) {
+      interval = setInterval(() => {
+        setRotationY((prev) => (prev + 2) % 360);
+      }, 30);
+    }
+    return () => clearInterval(interval);
+  }, [selectedProduct, isAutoRotate]);
 
   const filteredProducts = sampleProducts.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -164,7 +190,7 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* 3D Glass Hero Banner */}
+        {/* Hero Banner */}
         <section style={{ marginBottom: "24px" }}>
           <div style={{
             background: isDarkMode 
@@ -188,16 +214,16 @@ export default function HomePage() {
               display: "inline-block",
               marginBottom: "14px"
             }}>
-              ✨ {isDarkMode ? "DARK MODE ACTIVE" : "LIGHT MODE ACTIVE"}
+              ✨ 3D INTERACTIVE EXPERIENCE
             </span>
             <h2 style={{ fontSize: "24px", fontWeight: "900", margin: "0 0 10px 0", color: "#ffffff", lineHeight: "1.2" }}>
               ส่งต่อของไม่ได้ใช้ <br />
               <span style={{ background: "linear-gradient(to right, #a5b4fc, #f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                เปลี่ยนเป็นเงินไวในรั้วมหาลัย
+                กดดูสินค้าหมุน 3D ได้สมจริง
               </span>
             </h2>
             <p style={{ fontSize: "13px", color: "#e0e7ff", margin: "0 0 20px 0" }}>
-              ซื้อง่าย ขายคล่อง ปลอดภัย นัดรับในมอได้ทันที
+              คลิกที่สินค้าเพื่อเปิดหน้าต่างแสดงผลหมุน 3D
             </p>
             
             <a href="/add-product" style={{
@@ -273,7 +299,7 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* 3D FLOATING IMAGE PRODUCT GRID */}
+        {/* PRODUCT GRID */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
           <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "900", color: theme.text }}>🔥 สินค้ามาใหม่ล่าสุด</h3>
           <span style={{ fontSize: "12px", color: theme.subText, fontWeight: "bold" }}>{filteredProducts.length} รายการ</span>
@@ -289,6 +315,11 @@ export default function HomePage() {
             return (
               <div
                 key={product.id}
+                onClick={() => {
+                  setSelectedProduct(product);
+                  setRotationY(0);
+                  setIsAutoRotate(true);
+                }}
                 onMouseEnter={() => setHoveredCard(product.id)}
                 onMouseLeave={() => setHoveredCard(null)}
                 style={{
@@ -374,7 +405,7 @@ export default function HomePage() {
                       fontSize: "12px",
                       fontWeight: "bold"
                     }}>
-                      ➔
+                      3D ➔
                     </button>
                   </div>
                 </div>
@@ -384,6 +415,182 @@ export default function HomePage() {
         </div>
 
       </main>
+
+      {/* 3D PRODUCT VIEW MODAL (หน้าต่างลอยแสดงสินค้าหมุน 3D) */}
+      {selectedProduct && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(5, 7, 14, 0.85)",
+          backdropFilter: "blur(20px)",
+          zIndex: 999,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+          boxSizing: "border-box"
+        }}>
+          <div style={{
+            backgroundColor: theme.cardBg,
+            border: `1px solid ${theme.border}`,
+            borderRadius: "32px",
+            padding: "28px",
+            maxWidth: "480px",
+            width: "100%",
+            boxShadow: "0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.3)",
+            position: "relative"
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedProduct(null)}
+              style={{
+                position: "absolute",
+                top: "20px",
+                right: "20px",
+                backgroundColor: "rgba(255,255,255,0.1)",
+                color: theme.text,
+                border: "none",
+                borderRadius: "50%",
+                width: "36px",
+                height: "36px",
+                cursor: "pointer",
+                fontWeight: "bold",
+                fontSize: "16px"
+              }}
+            >
+              ✕
+            </button>
+
+            {/* 3D Interactive Stage */}
+            <div style={{
+              perspective: "1000px",
+              height: "220px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              margin: "10px 0 20px 0",
+              position: "relative"
+            }}>
+              {/* 3D Floating & Rotating Card */}
+              <div style={{
+                width: "200px",
+                height: "180px",
+                borderRadius: "24px",
+                boxShadow: "0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(99, 102, 241, 0.4)",
+                transformStyle: "preserve-3d",
+                transform: `rotateY(${rotationY}deg) rotateX(10deg)`,
+                transition: isAutoRotate ? "none" : "transform 0.1s ease-out",
+                position: "relative",
+                overflow: "hidden",
+                border: "2px solid rgba(129, 140, 248, 0.5)"
+              }}>
+                <img
+                  src={selectedProduct.image}
+                  alt={selectedProduct.title}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover"
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 3D Rotation Controls (หมุนซ้าย - ขวา - ออโต้) */}
+            <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
+              <button
+                onClick={() => {
+                  setIsAutoRotate(false);
+                  setRotationY((prev) => prev - 30);
+                }}
+                style={{
+                  backgroundColor: "rgba(99, 102, 241, 0.2)",
+                  border: "1px solid rgba(99, 102, 241, 0.4)",
+                  color: "#818cf8",
+                  padding: "8px 16px",
+                  borderRadius: "14px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  fontSize: "12px"
+                }}
+              >
+                🔄 หมุนซ้าย
+              </button>
+
+              <button
+                onClick={() => setIsAutoRotate(!isAutoRotate)}
+                style={{
+                  backgroundColor: isAutoRotate ? "#6366f1" : "rgba(255, 255, 255, 0.1)",
+                  border: "none",
+                  color: "#ffffff",
+                  padding: "8px 16px",
+                  borderRadius: "14px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  fontSize: "12px"
+                }}
+              >
+                {isAutoRotate ? "⏸️ หยุดหมุน" : "▶️ หมุนออโต้"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsAutoRotate(false);
+                  setRotationY((prev) => prev + 30);
+                }}
+                style={{
+                  backgroundColor: "rgba(99, 102, 241, 0.2)",
+                  border: "1px solid rgba(99, 102, 241, 0.4)",
+                  color: "#818cf8",
+                  padding: "8px 16px",
+                  borderRadius: "14px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  fontSize: "12px"
+                }}
+              >
+                หมุนขวา 🔄
+              </button>
+            </div>
+
+            {/* Product Details */}
+            <h3 style={{ fontSize: "18px", fontWeight: "900", margin: "0 0 6px 0", color: theme.text }}>
+              {selectedProduct.title}
+            </h3>
+            <p style={{ fontSize: "12px", color: theme.subText, margin: "0 0 12px 0" }}>
+              📍 ผู้ขาย: {selectedProduct.seller} | สภาพ: {selectedProduct.condition}
+            </p>
+            <p style={{ fontSize: "13px", color: theme.text, lineHeight: "1.5", margin: "0 0 20px 0" }}>
+              {selectedProduct.description}
+            </p>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "14px", borderTop: `1px solid ${theme.border}` }}>
+              <div>
+                <span style={{ fontSize: "11px", color: theme.subText, display: "block" }}>ราคาขายส่งต่อ</span>
+                <span style={{ fontSize: "22px", fontWeight: "900", background: "linear-gradient(to right, #6366f1, #ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  ฿{selectedProduct.price.toLocaleString()}
+                </span>
+              </div>
+              <button style={{
+                background: "linear-gradient(to right, #6366f1, #a855f7)",
+                color: "#ffffff",
+                border: "none",
+                padding: "12px 24px",
+                borderRadius: "16px",
+                fontWeight: "bold",
+                fontSize: "14px",
+                cursor: "pointer",
+                boxShadow: "0 10px 20px rgba(99, 102, 241, 0.4)"
+              }}>
+                💬 ทักแชตซื้อสินค้า
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Bottom Dock Navigation */}
       <nav style={{

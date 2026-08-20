@@ -46,7 +46,7 @@ const PRODUCTS: Product[] = [
   },
 ];
 
-ห
+
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
 

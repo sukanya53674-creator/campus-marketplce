@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 
 interface Product {
@@ -10,6 +10,7 @@ interface Product {
   category: string;
   seller: string;
   image: string;
+  condition: string;
 }
 
 const sampleProducts: Product[] = [
@@ -19,6 +20,7 @@ const sampleProducts: Product[] = [
     price: 180,
     category: "หนังสือ",
     seller: "ทีมอ 3",
+    condition: "สภาพดีมาก",
     image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80",
   },
   {
@@ -27,6 +29,7 @@ const sampleProducts: Product[] = [
     price: 450,
     category: "อุปกรณ์การเรียน",
     seller: "บอส วิศวะ",
+    condition: "ใช้งานปกติ",
     image: "https://images.unsplash.com/photo-1587145820266-a5951ee6f620?w=500&q=80",
   },
   {
@@ -35,6 +38,7 @@ const sampleProducts: Product[] = [
     price: 320,
     category: "เสื้อผ้า",
     seller: "พลอย บัญชี",
+    condition: "มือสองสภาพนางฟ้า",
     image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500&q=80",
   },
   {
@@ -43,6 +47,7 @@ const sampleProducts: Product[] = [
     price: 850,
     category: "ของใช้หอพัก",
     seller: "กอล์ฟ สถาปัตย์",
+    condition: "พร้อมใช้งาน",
     image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=500&q=80",
   },
 ];
@@ -52,6 +57,16 @@ const categories = ["ทั้งหมด", "หนังสือ", "อุป
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("ทั้งหมด");
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    setMousePos({
+      x: (clientX / innerWidth - 0.5) * 20,
+      y: (clientY / innerHeight - 0.5) * 20,
+    });
+  };
 
   const filteredProducts = sampleProducts.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -60,126 +75,182 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-12 font-sans selection:bg-indigo-100">
-      <div className="max-w-xl mx-auto px-4 pt-6 space-y-8">
+    <div 
+      onMouseMove={handleMouseMove}
+      className="min-h-screen bg-[#070913] text-slate-100 pb-20 font-sans selection:bg-indigo-500 selection:text-white overflow-hidden relative"
+    >
+      {/* Dynamic Ambient Background Glows */}
+      <div 
+        className="fixed -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none transition-transform duration-700 ease-out"
+        style={{ transform: `translate(${mousePos.x * 2}px, ${mousePos.y * 2}px)` }}
+      />
+      <div 
+        className="fixed top-1/2 -right-40 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none transition-transform duration-700 ease-out"
+        style={{ transform: `translate(${-mousePos.x * 2}px, ${-mousePos.y * 2}px)` }}
+      />
+
+      <div className="max-w-2xl mx-auto px-4 pt-6 space-y-8 relative z-10">
         
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              Campus<span className="text-indigo-600">Market</span>
-            </h1>
-            <p className="text-sm text-slate-500 mt-0.5">ตลาดนัดส่งต่อของเด็กวิทยาลัย</p>
-          </div>
-          <button className="bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold py-2 px-4 rounded-full border border-slate-200 shadow-sm transition-all active:scale-95 flex items-center gap-2">
-            <span className="text-lg">👋</span> เข้าสู่ระบบ
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <span className="text-slate-400 group-focus-within:text-indigo-500 transition-colors">🔍</span>
-          </div>
-          <input
-            type="text"
-            placeholder="ค้นหาสินค้า เช่น หนังสือ, เครื่องคิดเลข..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 shadow-sm transition-all"
-          />
-        </div>
-
-        {/* Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 p-6 shadow-lg shadow-indigo-200">
-          <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-          <div className="relative z-10 flex justify-between items-center gap-4">
-            <div>
-              <h2 className="text-xl font-bold text-white mb-1">มีของไม่ได้ใช้ไหม?</h2>
-              <p className="text-sm text-indigo-100">เปลี่ยนของเก่าเป็นเงิน ส่งต่อให้เพื่อนๆ</p>
+        {/* Experimental Futuristic Header */}
+        <header className="flex justify-between items-center bg-white/[0.03] backdrop-blur-xl border border-white/10 p-4 rounded-3xl shadow-2xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-[1px] shadow-lg shadow-indigo-500/30">
+              <div className="w-full h-full bg-[#0b0e1b] rounded-[15px] flex items-center justify-center font-black text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 to-pink-400">
+                CM
+              </div>
             </div>
-            <Link
-              href="/add-product"
-              className="bg-white text-indigo-600 font-bold text-sm px-5 py-3 rounded-2xl shadow-sm hover:shadow-md hover:scale-105 transition-all shrink-0 active:scale-95"
-            >
-              + ลงขายเลย
-            </Link>
+            <div>
+              <h1 className="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
+                Campus<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Hub</span>
+              </h1>
+              <p className="text-[11px] text-slate-400">3D Immersive Marketplace</p>
+            </div>
           </div>
-        </div>
+          
+          <button className="relative group overflow-hidden rounded-full p-[1px] focus:outline-none">
+            <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full group-hover:opacity-100 transition duration-300"></span>
+            <span className="relative px-4 py-2 rounded-full bg-[#0b0e1b] text-xs font-semibold text-slate-200 transition-all duration-300 group-hover:bg-transparent group-hover:text-white flex items-center gap-1.5">
+              <span>✨</span> เข้าสู่ระบบ
+            </span>
+          </button>
+        </header>
 
-        {/* Category Filter Chips */}
-        <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                selectedCategory === cat
-                  ? "bg-slate-900 text-white shadow-md shadow-slate-900/20"
-                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        {/* 3D Glass Hero Banner */}
+        <section 
+          className="relative rounded-3xl p-7 overflow-hidden border border-white/15 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-2xl shadow-2xl group transition-all duration-500 hover:border-indigo-500/40"
+          style={{
+            transform: `perspective(1000px) rotateX(${-mousePos.y * 0.3}deg) rotateY(${mousePos.x * 0.3}deg)`,
+          }}
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/30 to-pink-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
 
-        {/* Product Grid */}
-        <div>
-          <div className="flex justify-between items-end mb-5">
-            <h3 className="text-lg font-bold text-slate-900">
-              แนะนำสำหรับคุณ
-            </h3>
-            <span className="text-sm font-medium text-slate-500">{filteredProducts.length} รายการ</span>
-          </div>
+          <div className="relative z-10 space-y-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-indigo-500/20 border border-indigo-400/30 text-indigo-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+              นิสิต-นักศึกษา Marketplace
+            </span>
 
-          <div className="grid grid-cols-2 gap-4 sm:gap-5">
-            {filteredProducts.map((product) => (
-              <Link 
-                href={`#`} 
-                key={product.id}
-                className="bg-white rounded-3xl overflow-hidden border border-slate-100 flex flex-col justify-between hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black text-white leading-tight">
+                ส่งต่อของไม่ได้ใช้ <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
+                  รับเงินไว ปลอดภัยในรั้วมหาลัย
+                </span>
+              </h2>
+            </div>
+
+            <div className="pt-2 flex items-center gap-3">
+              <Link
+                href="/add-product"
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2"
               >
-                <div className="relative">
-                  <div className="aspect-[4/3] w-full bg-slate-100 overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-slate-800 text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                <span>🚀</span> ลงประกาศขายฟรี
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Floating Futuristic Search Bar */}
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+          <div className="relative flex items-center bg-[#0d1226]/90 border border-white/10 rounded-2xl px-4 py-3 shadow-xl backdrop-blur-xl">
+            <span className="text-indigo-400 text-lg mr-3">🔍</span>
+            <input
+              type="text"
+              placeholder="ค้นหาสินค้ามือสอง เช่น หนังสือ, เครื่องคิดเลข..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-transparent text-slate-100 placeholder-slate-500 text-sm focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Experimental Floating Category Pills */}
+        <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4">
+          {categories.map((cat) => {
+            const isActive = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`relative px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-300 active:scale-95 ${
+                  isActive
+                    ? "text-white shadow-lg shadow-indigo-500/30"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-white/5"
+                }`}
+              >
+                {isActive && (
+                  <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl -z-10 animate-fade-in"></span>
+                )}
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Interactive 3D Product Grid */}
+        <section>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-black text-white flex items-center gap-2">
+              <span>🔥</span> สินค้ามาใหม่ล่าสุด
+            </h3>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400">
+              {filteredProducts.length} รายการ
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className="group relative rounded-3xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 overflow-hidden backdrop-blur-xl hover:border-indigo-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/20 flex flex-col justify-between"
+              >
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070913] via-transparent to-transparent opacity-80"></div>
+                  
+                  <span className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-md text-indigo-300 text-[10px] font-bold px-2.5 py-1 rounded-xl border border-white/10">
                     {product.category}
                   </span>
                 </div>
 
-                <div className="p-4 flex flex-col flex-1 justify-between">
+                <div className="p-4 relative z-10 flex flex-col justify-between flex-1">
                   <div>
-                    <h4 className="text-sm font-semibold text-slate-800 line-clamp-2 leading-snug mb-1">
+                    <h4 className="text-xs font-bold text-slate-100 line-clamp-2 leading-relaxed group-hover:text-indigo-300 transition-colors">
                       {product.title}
                     </h4>
-                    <p className="text-xs text-slate-500 mb-3">{product.seller}</p>
+                    <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1">
+                      <span>👤</span> {product.seller}
+                    </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                    <span className="text-base font-extrabold text-indigo-600">
-                      ฿{product.price.toLocaleString()}
-                    </span>
-                    <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                      <span className="text-sm">➔</span>
+                  <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between">
+                    <div>
+                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">ราคา</p>
+                      <p className="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400">
+                        ฿{product.price.toLocaleString()}
+                      </p>
                     </div>
+
+                    <button className="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-400/30 flex items-center justify-center text-indigo-300 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-md">
+                      ➔
+                    </button>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
-          
+
           {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-slate-400">ไม่พบสินค้าที่คุณค้นหา 🥲</p>
+            <div className="text-center py-16 rounded-3xl border border-dashed border-white/10 bg-white/[0.01]">
+              <p className="text-slate-400 text-sm">ไม่พบรายการสินค้าที่คุณกำลังตามหา 🚀</p>
             </div>
           )}
-        </div>
+        </section>
 
       </div>
     </div>

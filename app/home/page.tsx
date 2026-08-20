@@ -46,7 +46,6 @@ const PRODUCTS: Product[] = [
   },
 ];
 
-
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -56,10 +55,9 @@ export default function HomePage() {
 
   return (
     <div style={{ backgroundColor: "#0b1329", minHeight: "100vh", color: "#ffffff", paddingBottom: "40px", fontFamily: "sans-serif" }}>
-      {/* Container หลัก: จำกัดความกว้างให้อยู่ตรงกลางพอดี ไม่ยืดเต็มจอ */}
       <div style={{ maxWidth: "768px", margin: "0 auto", padding: "20px 16px" }}>
         
-        {/* Header / แถบบน */}
+        {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <div>
             <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: 0, color: "#ffffff" }}>Campus Market</h1>
@@ -70,7 +68,7 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* ช่องค้นหา */}
+        {/* Search */}
         <div style={{ marginBottom: "20px" }}>
           <input
             type="text"
@@ -91,7 +89,7 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Banner สีน้ำเงินสด */}
+        {/* Banner - แก้ไข whiteSpace แล้ว */}
         <div style={{ backgroundColor: "#1d4ed8", borderRadius: "16px", padding: "20px", marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)" }}>
           <div>
             <h2 style={{ fontSize: "18px", fontWeight: "bold", margin: "0 0 4px 0", color: "#ffffff" }}>มีของไม่ได้ใช้ไหม?</h2>
@@ -102,12 +100,11 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* หัวข้อรายการสินค้า */}
+        {/* Product Grid */}
         <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px", color: "#ffffff" }}>
           สินค้าล่าสุด ({filteredProducts.length})
         </h3>
 
-        {/* ตารางสินค้า Grid 2 คอลัมน์ */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
           {filteredProducts.map((product) => (
             <div
@@ -122,7 +119,6 @@ export default function HomePage() {
                 justifyContent: "space-between"
               }}
             >
-              {/* รูปสินค้า */}
               <div style={{ height: "180px", width: "100%", backgroundColor: "#334155" }}>
                 <img
                   src={product.image}
@@ -131,7 +127,6 @@ export default function HomePage() {
                 />
               </div>
 
-              {/* เนื้อหาการ์ด */}
               <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <div>
                   <span style={{ backgroundColor: "#334155", color: "#cbd5e1", fontSize: "11px", padding: "4px 8px", borderRadius: "6px", fontWeight: "500" }}>

@@ -89,13 +89,13 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Banner - แก้ไข whiteSpace แล้ว */}
+        {/* Banner - ถอด whitespace ออกอย่างสมบูรณ์ */}
         <div style={{ backgroundColor: "#1d4ed8", borderRadius: "16px", padding: "20px", marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)" }}>
           <div>
             <h2 style={{ fontSize: "18px", fontWeight: "bold", margin: "0 0 4px 0", color: "#ffffff" }}>มีของไม่ได้ใช้ไหม?</h2>
             <p style={{ fontSize: "13px", color: "#dbeafe", margin: 0 }}>นำมาลงขายให้เพื่อนๆ ในวิทยาลัยได้เลยง่ายๆ</p>
           </div>
-          <button style={{ backgroundColor: "#ffffff", color: "#0f172a", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: "bold", fontSize: "13px", cursor: "pointer", whiteSpace: "nowrap" }}>
+          <button style={{ backgroundColor: "#ffffff", color: "#0f172a", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: "bold", fontSize: "13px", cursor: "pointer" }}>
             + ลงขายเลย
           </button>
         </div>

@@ -64,7 +64,7 @@ export default function HomePage() {
             <p style={{ fontSize: "14px", color: "#94a3b8", margin: "4px 0 0 0" }}>ตลาดนัดเด็กวิทยาลัย</p>
           </div>
           <button style={{ backgroundColor: "#1e293b", border: "1px solid #334155", color: "#fff", padding: "8px 16px", borderRadius: "20px", fontSize: "14px", cursor: "pointer" }}>
-            👤 เข้าสู่ระบบบ
+            👤 เข้าสู่ระบบ
           </button>
         </div>
 

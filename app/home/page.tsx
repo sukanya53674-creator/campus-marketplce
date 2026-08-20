@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 
 interface Product {
   id: number;
@@ -11,7 +12,7 @@ interface Product {
   image: string;
 }
 
-const PRODUCTS: Product[] = [
+const sampleProducts: Product[] = [
   {
     id: 1,
     title: "หนังสือเรียน Calculus 1 (สภาพ 90%)",
@@ -46,110 +47,124 @@ const PRODUCTS: Product[] = [
   },
 ];
 
+const categories = ["ทั้งหมด", "หนังสือ", "อุปกรณ์การเรียน", "เสื้อผ้า", "ของใช้หอพัก"];
+
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("ทั้งหมด");
 
-  const filteredProducts = PRODUCTS.filter((item) =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = sampleProducts.filter((item) => {
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "ทั้งหมด" || item.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div style={{ backgroundColor: "#0b1329", minHeight: "100vh", color: "#ffffff", paddingBottom: "40px", fontFamily: "sans-serif" }}>
-      <div style={{ maxWidth: "768px", margin: "0 auto", padding: "20px 16px" }}>
+    <div className="min-h-screen bg-slate-950 text-slate-100 pb-12 font-sans">
+      <div className="max-w-xl mx-auto px-4 pt-6 space-y-6">
         
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <div className="flex justify-between items-center bg-slate-900/80 backdrop-blur p-4 rounded-2xl border border-slate-800 shadow-sm">
           <div>
-            <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: 0, color: "#ffffff" }}>Campus Market</h1>
-            <p style={{ fontSize: "14px", color: "#94a3b8", margin: "4px 0 0 0" }}>ตลาดนัดเด็กวิทยาลัย</p>
+            <h1 className="text-xl font-extrabold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+              Campus Market
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5">ตลาดนัดส่งต่อของเด็กวิทยาลัย</p>
           </div>
-          <button style={{ backgroundColor: "#1e293b", border: "1px solid #334155", color: "#fff", padding: "8px 16px", borderRadius: "20px", fontSize: "14px", cursor: "pointer" }}>
-            👤 เข้าสู่ระบ
+          <button className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 px-4 rounded-xl border border-slate-700 transition active:scale-95">
+            👤 เข้าสู่ระบบ
           </button>
         </div>
 
-
-
-        {/* Search */}
-        <div style={{ marginBottom: "20px" }}>
+        {/* Search Bar */}
+        <div className="relative">
           <input
             type="text"
             placeholder="🔍 ค้นหาสินค้า เช่น หนังสือ, เครื่องคิดเลข..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px 16px",
-              borderRadius: "12px",
-              border: "1px solid #334155",
-              backgroundColor: "#1e293b",
-              color: "#ffffff",
-              fontSize: "14px",
-              outline: "none",
-              boxSizing: "border-box"
-            }}
+            className="w-full bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-500 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-inner"
           />
         </div>
 
-        {/* Banner - ถอด whitespace ออกอย่างสมบูรณ์ */}
-        <div style={{ backgroundColor: "#1d4ed8", borderRadius: "16px", padding: "20px", marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)" }}>
-          <div>
-            <h2 style={{ fontSize: "18px", fontWeight: "bold", margin: "0 0 4px 0", color: "#ffffff" }}>มีของไม่ได้ใช้ไหม?</h2>
-            <p style={{ fontSize: "13px", color: "#dbeafe", margin: 0 }}>นำมาลงขายให้เพื่อนๆ ในวิทยาลัยได้เลยง่ายๆ</p>
+        {/* Banner */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 p-5 shadow-lg shadow-blue-900/20">
+          <div className="relative z-10 flex justify-between items-center gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-white">มีของไม่ได้ใช้ไหม?</h2>
+              <p className="text-xs text-blue-100 mt-1">นำมาลงขายให้เพื่อนๆ ในวิทยาลัยได้เลยง่ายๆ</p>
+            </div>
+            <Link
+              href="/add-product"
+              className="bg-white text-blue-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow hover:bg-blue-50 transition shrink-0 active:scale-95"
+            >
+              + ลงขายเลย
+            </Link>
           </div>
-          <button style={{ backgroundColor: "#ffffff", color: "#0f172a", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: "bold", fontSize: "13px", cursor: "pointer" }}>
-            + ลงขายเลย
-          </button>
+        </div>
+
+        {/* Category Filter Chips */}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition ${
+                selectedCategory === cat
+                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                  : "bg-slate-900 text-slate-400 hover:bg-slate-800 border border-slate-800"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         {/* Product Grid */}
-        <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px", color: "#ffffff" }}>
-          สินค้าล่าสุด ({filteredProducts.length})
-        </h3>
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-base font-bold text-slate-200">
+              สินค้าล่าสุด <span className="text-xs font-normal text-slate-500">({filteredProducts.length} รายการ)</span>
+            </h3>
+          </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              style={{
-                backgroundColor: "#1e293b",
-                borderRadius: "16px",
-                overflow: "hidden",
-                border: "1px solid #334155",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between"
-              }}
-            >
-              <div style={{ height: "180px", width: "100%", backgroundColor: "#334155" }}>
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              </div>
-
-              <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div className="grid grid-cols-2 gap-3.5">
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className="bg-slate-900 border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-slate-700 transition shadow-sm"
+              >
                 <div>
-                  <span style={{ backgroundColor: "#334155", color: "#cbd5e1", fontSize: "11px", padding: "4px 8px", borderRadius: "6px", fontWeight: "500" }}>
-                    {product.category}
-                  </span>
-                  <h4 style={{ fontSize: "14px", fontWeight: "600", color: "#f8fafc", margin: "8px 0 12px 0", lineHeight: "1.4" }}>
-                    {product.title}
-                  </h4>
+                  <div className="h-36 w-full bg-slate-800 relative">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <span className="absolute top-2 left-2 bg-slate-950/70 backdrop-blur text-slate-300 text-[10px] px-2 py-0.5 rounded-md border border-slate-700/50">
+                      {product.category}
+                    </span>
+                  </div>
+
+                  <div className="p-3">
+                    <h4 className="text-xs font-medium text-slate-200 line-clamp-2 min-h-[32px]">
+                      {product.title}
+                    </h4>
+                  </div>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "8px", borderTop: "1px solid #334155" }}>
-                  <span style={{ color: "#60a5fa", fontWeight: "bold", fontSize: "16px" }}>
-                    ฿{product.price}
-                  </span>
-                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
-                    {product.seller}
-                  </span>
+                <div className="p-3 pt-0 flex items-center justify-between border-t border-slate-800/50 mt-2">
+                  <div>
+                    <p className="text-[10px] text-slate-500">{product.seller}</p>
+                    <p className="text-sm font-bold text-blue-400">฿{product.price}</p>
+                  </div>
+                  <button className="bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-300 text-[11px] font-medium px-2.5 py-1 rounded-lg transition">
+                    ดู
+                  </button>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
       </div>

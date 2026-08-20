@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 interface Product {
@@ -57,16 +57,6 @@ const categories = ["ทั้งหมด", "หนังสือ", "อุป
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("ทั้งหมด");
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { clientX, clientY } = e;
-    const { innerWidth, innerHeight } = window;
-    setMousePos({
-      x: (clientX / innerWidth - 0.5) * 20,
-      y: (clientY / innerHeight - 0.5) * 20,
-    });
-  };
 
   const filteredProducts = sampleProducts.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -75,182 +65,209 @@ export default function HomePage() {
   });
 
   return (
-    <div 
-      onMouseMove={handleMouseMove}
-      className="min-h-screen bg-[#070913] text-slate-100 pb-20 font-sans selection:bg-indigo-500 selection:text-white overflow-hidden relative"
-    >
-      {/* Dynamic Ambient Background Glows */}
-      <div 
-        className="fixed -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none transition-transform duration-700 ease-out"
-        style={{ transform: `translate(${mousePos.x * 2}px, ${mousePos.y * 2}px)` }}
-      />
-      <div 
-        className="fixed top-1/2 -right-40 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none transition-transform duration-700 ease-out"
-        style={{ transform: `translate(${-mousePos.x * 2}px, ${-mousePos.y * 2}px)` }}
-      />
-
-      <div className="max-w-2xl mx-auto px-4 pt-6 space-y-8 relative z-10">
+    <div style={{ backgroundColor: "#090d16", color: "#f8fafc", minHeight: "100vh", fontFamily: "sans-serif", paddingBottom: "60px" }}>
+      
+      {/* Container */}
+      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "24px 16px" }}>
         
-        {/* Experimental Futuristic Header */}
-        <header className="flex justify-between items-center bg-white/[0.03] backdrop-blur-xl border border-white/10 p-4 rounded-3xl shadow-2xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-[1px] shadow-lg shadow-indigo-500/30">
-              <div className="w-full h-full bg-[#0b0e1b] rounded-[15px] flex items-center justify-center font-black text-transparent bg-clip-text bg-gradient-to-tr from-indigo-400 to-pink-400">
-                CM
-              </div>
-            </div>
-            <div>
-              <h1 className="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
-                Campus<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Hub</span>
-              </h1>
-              <p className="text-[11px] text-slate-400">3D Immersive Marketplace</p>
-            </div>
+        {/* Header */}
+        <header style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          backgroundColor: "rgba(30, 41, 59, 0.7)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          padding: "12px 18px",
+          borderRadius: "20px",
+          marginBottom: "24px",
+          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)"
+        }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: "20px", fontWeight: "900", background: "linear-gradient(to right, #818cf8, #c084fc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              CampusMarket
+            </h1>
+            <p style={{ margin: "2px 0 0 0", fontSize: "11px", color: "#94a3b8" }}>3D Immersive Marketplace</p>
           </div>
-          
-          <button className="relative group overflow-hidden rounded-full p-[1px] focus:outline-none">
-            <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full group-hover:opacity-100 transition duration-300"></span>
-            <span className="relative px-4 py-2 rounded-full bg-[#0b0e1b] text-xs font-semibold text-slate-200 transition-all duration-300 group-hover:bg-transparent group-hover:text-white flex items-center gap-1.5">
-              <span>✨</span> เข้าสู่ระบบ
-            </span>
+          <button style={{
+            backgroundColor: "#6366f1",
+            color: "#ffffff",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "14px",
+            fontSize: "12px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            boxShadow: "0 4px 14px rgba(99, 102, 241, 0.4)"
+          }}>
+            👤 เข้าสู่ระบบ
           </button>
         </header>
 
         {/* 3D Glass Hero Banner */}
-        <section 
-          className="relative rounded-3xl p-7 overflow-hidden border border-white/15 bg-gradient-to-br from-white/[0.07] to-white/[0.01] backdrop-blur-2xl shadow-2xl group transition-all duration-500 hover:border-indigo-500/40"
-          style={{
-            transform: `perspective(1000px) rotateX(${-mousePos.y * 0.3}deg) rotateY(${mousePos.x * 0.3}deg)`,
-          }}
-        >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/30 to-pink-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
-
-          <div className="relative z-10 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-indigo-500/20 border border-indigo-400/30 text-indigo-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
-              นิสิต-นักศึกษา Marketplace
-            </span>
-
-            <div className="space-y-1">
-              <h2 className="text-2xl font-black text-white leading-tight">
-                ส่งต่อของไม่ได้ใช้ <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
-                  รับเงินไว ปลอดภัยในรั้วมหาลัย
-                </span>
-              </h2>
-            </div>
-
-            <div className="pt-2 flex items-center gap-3">
-              <Link
-                href="/add-product"
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2"
-              >
-                <span>🚀</span> ลงประกาศขายฟรี
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Floating Futuristic Search Bar */}
-        <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-          <div className="relative flex items-center bg-[#0d1226]/90 border border-white/10 rounded-2xl px-4 py-3 shadow-xl backdrop-blur-xl">
-            <span className="text-indigo-400 text-lg mr-3">🔍</span>
-            <input
-              type="text"
-              placeholder="ค้นหาสินค้ามือสอง เช่น หนังสือ, เครื่องคิดเลข..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-transparent text-slate-100 placeholder-slate-500 text-sm focus:outline-none"
-            />
-          </div>
+        <div style={{
+          background: "linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%)",
+          borderRadius: "24px",
+          padding: "24px",
+          marginBottom: "24px",
+          boxShadow: "0 20px 30px -10px rgba(79, 70, 229, 0.4)",
+          position: "relative",
+          overflow: "hidden",
+          border: "1px solid rgba(255, 255, 255, 0.2)"
+        }}>
+          <span style={{
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
+            color: "#ffffff",
+            fontSize: "11px",
+            fontWeight: "bold",
+            padding: "4px 12px",
+            borderRadius: "20px",
+            display: "inline-block",
+            marginBottom: "12px"
+          }}>
+            ✨ นิสิต-นักศึกษา Marketplace
+          </span>
+          <h2 style={{ fontSize: "22px", fontWeight: "800", margin: "0 0 8px 0", color: "#ffffff", lineHeight: "1.3" }}>
+            ส่งต่อของไม่ได้ใช้<br />รับเงินไว ปลอดภัยในรั้วมหาลัย
+          </h2>
+          <p style={{ fontSize: "13px", color: "#e0e7ff", margin: "0 0 16px 0" }}>
+            เปลี่ยนของสะสม ของไม่ได้ใช้ เป็นรายได้ง่ายๆ
+          </p>
+          <Link href="/add-product" style={{
+            backgroundColor: "#ffffff",
+            color: "#4338ca",
+            padding: "10px 20px",
+            borderRadius: "14px",
+            fontWeight: "bold",
+            fontSize: "13px",
+            textDecoration: "none",
+            display: "inline-block",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+          }}>
+            🚀 ลงประกาศขายฟรี
+          </Link>
         </div>
 
-        {/* Experimental Floating Category Pills */}
-        <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4">
+        {/* Search Bar */}
+        <div style={{ marginBottom: "20px" }}>
+          <input
+            type="text"
+            placeholder="🔍 ค้นหาสินค้า เช่น หนังสือ, เครื่องคิดเลข..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              width: "100%",
+              backgroundColor: "#1e293b",
+              border: "1px solid #334155",
+              color: "#ffffff",
+              padding: "14px 18px",
+              borderRadius: "16px",
+              fontSize: "14px",
+              outline: "none",
+              boxSizing: "border-box",
+              boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)"
+            }}
+          />
+        </div>
+
+        {/* Category Pills */}
+        <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "12px", marginBottom: "20px" }}>
           {categories.map((cat) => {
             const isActive = selectedCategory === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`relative px-5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-300 active:scale-95 ${
-                  isActive
-                    ? "text-white shadow-lg shadow-indigo-500/30"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-white/5"
-                }`}
+                style={{
+                  backgroundColor: isActive ? "#6366f1" : "#1e293b",
+                  color: isActive ? "#ffffff" : "#94a3b8",
+                  border: isActive ? "1px solid #818cf8" : "1px solid #334155",
+                  padding: "8px 16px",
+                  borderRadius: "20px",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                  cursor: "pointer",
+                  boxShadow: isActive ? "0 4px 12px rgba(99, 102, 241, 0.3)" : "none"
+                }}
               >
-                {isActive && (
-                  <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl -z-10 animate-fade-in"></span>
-                )}
                 {cat}
               </button>
             );
           })}
         </div>
 
-        {/* Interactive 3D Product Grid */}
-        <section>
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-black text-white flex items-center gap-2">
-              <span>🔥</span> สินค้ามาใหม่ล่าสุด
-            </h3>
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400">
-              {filteredProducts.length} รายการ
-            </span>
-          </div>
+        {/* Product Grid */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+          <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>🔥 สินค้าแนะนำล่าสุด</h3>
+          <span style={{ fontSize: "12px", color: "#64748b" }}>{filteredProducts.length} รายการ</span>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="group relative rounded-3xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 overflow-hidden backdrop-blur-xl hover:border-indigo-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/20 flex flex-col justify-between"
-              >
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#070913] via-transparent to-transparent opacity-80"></div>
-                  
-                  <span className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-md text-indigo-300 text-[10px] font-bold px-2.5 py-1 rounded-xl border border-white/10">
-                    {product.category}
-                  </span>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "14px" }}>
+          {filteredProducts.map((product) => (
+            <div
+              key={product.id}
+              style={{
+                backgroundColor: "#1e293b",
+                borderRadius: "20px",
+                overflow: "hidden",
+                border: "1px solid #334155",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)"
+              }}
+            >
+              <div style={{ position: "relative", height: "140px", backgroundColor: "#0f172a" }}>
+                <img
+                  src={product.image}
+                  alt={product.title}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+                <span style={{
+                  position: "absolute",
+                  top: "8px",
+                  left: "8px",
+                  backgroundColor: "rgba(15, 23, 42, 0.8)",
+                  backdropFilter: "blur(4px)",
+                  color: "#cbd5e1",
+                  fontSize: "10px",
+                  fontWeight: "bold",
+                  padding: "3px 8px",
+                  borderRadius: "8px"
+                }}>
+                  {product.category}
+                </span>
+              </div>
+
+              <div style={{ padding: "12px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div>
+                  <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "600", color: "#f1f5f9", lineHeight: "1.4" }}>
+                    {product.title}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: "11px", color: "#64748b" }}>👤 {product.seller}</p>
                 </div>
 
-                <div className="p-4 relative z-10 flex flex-col justify-between flex-1">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-100 line-clamp-2 leading-relaxed group-hover:text-indigo-300 transition-colors">
-                      {product.title}
-                    </h4>
-                    <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1">
-                      <span>👤</span> {product.seller}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between">
-                    <div>
-                      <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">ราคา</p>
-                      <p className="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400">
-                        ฿{product.price.toLocaleString()}
-                      </p>
-                    </div>
-
-                    <button className="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-400/30 flex items-center justify-center text-indigo-300 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-md">
-                      ➔
-                    </button>
-                  </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", paddingTop: "8px", borderTop: "1px solid #334155" }}>
+                  <span style={{ fontSize: "15px", fontWeight: "800", color: "#818cf8" }}>
+                    ฿{product.price.toLocaleString()}
+                  </span>
+                  <button style={{
+                    backgroundColor: "#334155",
+                    color: "#f8fafc",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "4px 8px",
+                    fontSize: "11px",
+                    cursor: "pointer"
+                  }}>
+                    ดู ➔
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-16 rounded-3xl border border-dashed border-white/10 bg-white/[0.01]">
-              <p className="text-slate-400 text-sm">ไม่พบรายการสินค้าที่คุณกำลังตามหา 🚀</p>
             </div>
-          )}
-        </section>
+          ))}
+        </div>
 
       </div>
     </div>

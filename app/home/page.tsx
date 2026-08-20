@@ -71,15 +71,15 @@ export default function HomePage() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
-  // 3D Interactive State Controls
+  // --- 3D Interactive Controls & Rotation States ---
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [rotX, setRotX] = useState(12);
+  const [rotX, setRotX] = useState(15);
   const [rotY, setRotY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [isAutoRotate, setIsAutoRotate] = useState(true);
 
-  // Auto Rotation effect
+  // ระบบหมุน 3D อัตโนมัติเมื่อเปิดดู
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (selectedProduct && isAutoRotate && !isDragging) {
@@ -90,10 +90,10 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [selectedProduct, isAutoRotate, isDragging]);
 
-  // Drag Handlers for 3D Control
+  // ระบบดักจับการลากเมาส์ / การใช้นิ้วลากบนมือถือเพื่อหมุนดูเอง
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     setIsDragging(true);
-    setIsAutoRotate(false);
+    setIsAutoRotate(false); // หยุดหมุนออโต้เมื่อผู้ใช้เริ่มหมุนเอง
     const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
     const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
     setStartPos({ x: clientX, y: clientY });
@@ -108,7 +108,7 @@ export default function HomePage() {
     const deltaY = clientY - startPos.y;
 
     setRotY((prev) => prev + deltaX * 0.9);
-    setRotX((prev) => Math.max(-30, Math.min(35, prev - deltaY * 0.5)));
+    setRotX((prev) => Math.max(-35, Math.min(40, prev - deltaY * 0.5)));
 
     setStartPos({ x: clientX, y: clientY });
   };
@@ -188,7 +188,7 @@ export default function HomePage() {
               <h1 style={{ margin: 0, fontSize: "20px", fontWeight: "900", background: "linear-gradient(to right, #6366f1, #ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 CampusHub 3D
               </h1>
-              <p style={{ margin: 0, fontSize: "11px", color: theme.subText }}>3D Floating Marketplace</p>
+              <p style={{ margin: 0, fontSize: "11px", color: theme.subText }}>3D Interactive Model Showcase</p>
             </div>
           </div>
 
@@ -251,16 +251,16 @@ export default function HomePage() {
               display: "inline-block",
               marginBottom: "14px"
             }}>
-              ✨ Borderless 3D Object Preview
+              ✨ Interactive 3D Orbit Experience
             </span>
             <h2 style={{ fontSize: "24px", fontWeight: "900", margin: "0 0 10px 0", color: "#ffffff", lineHeight: "1.2" }}>
-              กดสินค้าเพื่อดูโมเดลลอย <br />
+              กดเลือกสินค้าเพื่อเข้าดู <br />
               <span style={{ background: "linear-gradient(to right, #a5b4fc, #f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                โชว์เฉพาะตัวสินค้าแบบ 3D อิสระ
+                โมเดล 3D ลอยตัวและลากหมุนดูได้เอง
               </span>
             </h2>
             <p style={{ fontSize: "13px", color: "#e0e7ff", margin: "0 0 20px 0" }}>
-              ไม่มีขอบกล่องบดบัง ลากหมุนได้ 360 องศา
+              โชว์เฉพาะตัวสินค้าแบบไร้ขอบบดบัง สัมผัสเสมือนจริง 360°
             </p>
             
             <a href="/add-product" style={{
@@ -354,7 +354,7 @@ export default function HomePage() {
                 key={product.id}
                 onClick={() => {
                   setSelectedProduct(product);
-                  setRotX(12);
+                  setRotX(15);
                   setRotY(0);
                   setIsAutoRotate(true);
                 }}
@@ -453,7 +453,7 @@ export default function HomePage() {
 
       </main>
 
-      {/* 3D PURE OBJECT FLOATING MODAL (โชว์เฉพาะตัวสินค้าลอยลอย) */}
+      {/* 3D FLOATING & INTERACTIVE ROTATING PRODUCT MODAL */}
       {selectedProduct && (
         <div style={{
           position: "fixed",
@@ -480,7 +480,7 @@ export default function HomePage() {
             boxShadow: "0 30px 60px rgba(0, 0, 0, 0.8), 0 0 50px rgba(99, 102, 241, 0.35)",
             position: "relative"
           }}>
-            {/* Close Button */}
+            {/* ปุ่มปิด Modal */}
             <button
               onClick={() => setSelectedProduct(null)}
               style={{
@@ -502,7 +502,7 @@ export default function HomePage() {
               ✕
             </button>
 
-            {/* Hint Badge */}
+            {/* ข้อความแนะนำวิธีใช้ */}
             <div style={{ textAlign: "center", marginBottom: "10px" }}>
               <span style={{
                 backgroundColor: "rgba(99, 102, 241, 0.2)",
@@ -513,11 +513,11 @@ export default function HomePage() {
                 fontWeight: "bold",
                 border: "1px solid rgba(129, 140, 248, 0.3)"
               }}>
-                👆 คลิกค้างแล้วลากเพื่อหมุนโมเดล 3D
+                🖱️ คลิกค้างหรือเอานิ้วลากที่ตัวสินค้าเพื่อหมุนดู 360° ได้เอง
               </span>
             </div>
 
-            {/* Pure 3D Floating Stage (ไม่มีกรอบกล่องพื้นหลังรูป) */}
+            {/* 3D FLOATING STAGE (แสดงตัวสินค้าลอยลอย + หมุนดูได้เอง) */}
             <div 
               onMouseDown={handleMouseDown}
               onTouchStart={handleMouseDown}
@@ -532,7 +532,7 @@ export default function HomePage() {
                 margin: "10px 0"
               }}
             >
-              {/* Dynamic Bottom Radial Glow & Shadow */}
+              {/* แสงนีออนและเงาสะท้อนลอยใต้สินค้า */}
               <div style={{
                 position: "absolute",
                 bottom: "15px",
@@ -545,7 +545,7 @@ export default function HomePage() {
                 transition: isDragging ? "none" : "transform 0.1s"
               }} />
 
-              {/* ISOLATED 3D MODEL (ตัดกรอบ ถอดสีพื้นหลัง โชว์ลอยๆ) */}
+              {/* 3D MODEL OBJECT (ถอดขอบ/กล่องสี่เหลี่ยมออก เหลือเฉพาะโมเดลลอย) */}
               <div style={{
                 width: "180px",
                 height: "180px",
@@ -566,14 +566,14 @@ export default function HomePage() {
                     maxHeight: "100%",
                     objectFit: "contain",
                     pointerEvents: "none",
-                    mixBlendMode: "screen", // เคลียร์ฉากหลังรูปให้เนียนลอยลอย
+                    mixBlendMode: "screen", // ตัดฉากหลังของรูปเพื่อความเนียนแบบลอยตัว
                     borderRadius: "16px"
                   }}
                 />
               </div>
             </div>
 
-            {/* Interactive Buttons */}
+            {/* ปุ่มควบคุมทิศทางแบบกดเพิ่มเติม */}
             <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "18px" }}>
               <button
                 onClick={() => {
@@ -630,7 +630,7 @@ export default function HomePage() {
               </button>
             </div>
 
-            {/* Detail Content */}
+            {/* รายละเอียดสินค้า */}
             <h3 style={{ fontSize: "17px", fontWeight: "900", margin: "0 0 4px 0", color: theme.text }}>
               {selectedProduct.title}
             </h3>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 
 interface Product {
   id: number;
@@ -10,7 +9,6 @@ interface Product {
   category: string;
   seller: string;
   image: string;
-  condition: string;
 }
 
 const sampleProducts: Product[] = [
@@ -20,7 +18,6 @@ const sampleProducts: Product[] = [
     price: 180,
     category: "หนังสือ",
     seller: "ทีมอ 3",
-    condition: "สภาพดีมาก",
     image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80",
   },
   {
@@ -29,7 +26,6 @@ const sampleProducts: Product[] = [
     price: 450,
     category: "อุปกรณ์การเรียน",
     seller: "บอส วิศวะ",
-    condition: "ใช้งานปกติ",
     image: "https://images.unsplash.com/photo-1587145820266-a5951ee6f620?w=500&q=80",
   },
   {
@@ -38,7 +34,6 @@ const sampleProducts: Product[] = [
     price: 320,
     category: "เสื้อผ้า",
     seller: "พลอย บัญชี",
-    condition: "มือสองสภาพนางฟ้า",
     image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500&q=80",
   },
   {
@@ -47,7 +42,6 @@ const sampleProducts: Product[] = [
     price: 850,
     category: "ของใช้หอพัก",
     seller: "กอล์ฟ สถาปัตย์",
-    condition: "พร้อมใช้งาน",
     image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=500&q=80",
   },
 ];
@@ -63,23 +57,9 @@ const categories = [
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("ทั้งหมด");
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [activeTab, setActiveTab] = useState("home");
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-
-  // Track Mouse Movement for 3D Tilt Effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const { clientX, clientY } = e;
-      const { innerWidth, innerHeight } = window;
-      const x = (clientX / innerWidth - 0.5) * 20;
-      const y = (clientY / innerHeight - 0.5) * 20;
-      setMousePos({ x, y });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
 
   const filteredProducts = sampleProducts.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -87,7 +67,6 @@ export default function HomePage() {
     return matchesSearch && matchesCategory;
   });
 
-  // Dynamic Theme Colors
   const theme = {
     bg: isDarkMode ? "#05070e" : "#f1f5f9",
     text: isDarkMode ? "#f1f5f9" : "#0f172a",
@@ -104,48 +83,17 @@ export default function HomePage() {
       backgroundColor: theme.bg,
       color: theme.text,
       minHeight: "100vh",
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      fontFamily: "system-ui, -apple-system, sans-serif",
       paddingBottom: "110px",
       position: "relative",
       overflowX: "hidden",
-      transition: "background-color 0.4s ease, color 0.4s ease"
+      transition: "background-color 0.3s ease, color 0.3s ease"
     }}>
       
-      {/* 3D Dynamic Ambient Glow Orbs */}
-      <div style={{
-        position: "fixed",
-        top: "-10%",
-        left: "-10%",
-        width: "500px",
-        height: "500px",
-        background: isDarkMode 
-          ? "radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(0,0,0,0) 70%)"
-          : "radial-gradient(circle, rgba(129, 140, 248, 0.3) 0%, rgba(0,0,0,0) 70%)",
-        filter: "blur(90px)",
-        pointerEvents: "none",
-        transform: `translate(${mousePos.x * 1.5}px, ${mousePos.y * 1.5}px)`,
-        transition: "transform 0.2s ease-out"
-      }} />
-
-      <div style={{
-        position: "fixed",
-        top: "40%",
-        right: "-10%",
-        width: "500px",
-        height: "500px",
-        background: isDarkMode 
-          ? "radial-gradient(circle, rgba(217, 70, 239, 0.2) 0%, rgba(0,0,0,0) 70%)"
-          : "radial-gradient(circle, rgba(244, 114, 182, 0.25) 0%, rgba(0,0,0,0) 70%)",
-        filter: "blur(90px)",
-        pointerEvents: "none",
-        transform: `translate(${-mousePos.x * 1.2}px, ${-mousePos.y * 1.2}px)`,
-        transition: "transform 0.2s ease-out"
-      }} />
-
-      {/* Main Container */}
+      {/* Container */}
       <main style={{ maxWidth: "640px", margin: "0 auto", padding: "20px 16px", position: "relative", zIndex: 2 }}>
         
-        {/* Header & Theme Switcher */}
+        {/* Header */}
         <header style={{
           display: "flex",
           justifyContent: "space-between",
@@ -156,8 +104,7 @@ export default function HomePage() {
           padding: "14px 20px",
           borderRadius: "24px",
           marginBottom: "24px",
-          boxShadow: `0 20px 40px ${theme.shadow}`,
-          transition: "all 0.4s ease"
+          boxShadow: `0 20px 40px ${theme.shadow}`
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{
@@ -170,8 +117,7 @@ export default function HomePage() {
               justifyContent: "center",
               color: "#ffffff",
               fontWeight: "900",
-              fontSize: "18px",
-              boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)"
+              fontSize: "18px"
             }}>
               C
             </div>
@@ -184,7 +130,6 @@ export default function HomePage() {
           </div>
 
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            {/* Dark/Light Toggle Button */}
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
               style={{
@@ -198,10 +143,8 @@ export default function HomePage() {
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.3s ease"
+                justifyContent: "center"
               }}
-              title="สลับโหมดมืด/สว่าง"
             >
               {isDarkMode ? "☀️" : "🌙"}
             </button>
@@ -214,8 +157,7 @@ export default function HomePage() {
               borderRadius: "50px",
               fontSize: "12px",
               fontWeight: "bold",
-              cursor: "pointer",
-              boxShadow: "0 4px 15px rgba(99, 102, 241, 0.4)"
+              cursor: "pointer"
             }}>
               เข้าสู่ระบบ
             </button>
@@ -223,7 +165,7 @@ export default function HomePage() {
         </header>
 
         {/* 3D Glass Hero Banner */}
-        <section style={{ perspective: "1000px", marginBottom: "24px" }}>
+        <section style={{ marginBottom: "24px" }}>
           <div style={{
             background: isDarkMode 
               ? "linear-gradient(135deg, rgba(30, 27, 75, 0.85) 0%, rgba(88, 28, 135, 0.85) 100%)"
@@ -233,62 +175,44 @@ export default function HomePage() {
             padding: "28px 24px",
             border: "1px solid rgba(255, 255, 255, 0.2)",
             boxShadow: "0 25px 50px -12px rgba(99, 102, 241, 0.3)",
-            transform: `rotateX(${-mousePos.y * 0.15}deg) rotateY(${mousePos.x * 0.15}deg)`,
-            transition: "transform 0.1s ease-out",
             position: "relative",
             overflow: "hidden"
           }}>
-            <div style={{
-              position: "absolute",
-              top: "-50px",
-              right: "-50px",
-              width: "180px",
-              height: "180px",
-              background: "linear-gradient(135deg, #818cf8, #ec4899)",
-              borderRadius: "50%",
-              filter: "blur(50px)",
-              opacity: 0.5
-            }} />
-
-            <div style={{ position: "relative", zIndex: 2 }}>
-              <span style={{
-                backgroundColor: "rgba(255, 255, 255, 0.2)",
-                color: "#ffffff",
-                fontSize: "11px",
-                fontWeight: "bold",
-                padding: "5px 14px",
-                borderRadius: "20px",
-                display: "inline-block",
-                marginBottom: "14px"
-              }}>
-                ✨ {isDarkMode ? "DARK MODE ACTIVE" : "LIGHT MODE ACTIVE"}
+            <span style={{
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              color: "#ffffff",
+              fontSize: "11px",
+              fontWeight: "bold",
+              padding: "5px 14px",
+              borderRadius: "20px",
+              display: "inline-block",
+              marginBottom: "14px"
+            }}>
+              ✨ {isDarkMode ? "DARK MODE ACTIVE" : "LIGHT MODE ACTIVE"}
+            </span>
+            <h2 style={{ fontSize: "24px", fontWeight: "900", margin: "0 0 10px 0", color: "#ffffff", lineHeight: "1.2" }}>
+              ส่งต่อของไม่ได้ใช้ <br />
+              <span style={{ background: "linear-gradient(to right, #a5b4fc, #f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                เปลี่ยนเป็นเงินไวในรั้วมหาลัย
               </span>
-              <h2 style={{ fontSize: "24px", fontWeight: "900", margin: "0 0 10px 0", color: "#ffffff", lineHeight: "1.2" }}>
-                ส่งต่อของไม่ได้ใช้ <br />
-                <span style={{ background: "linear-gradient(to right, #a5b4fc, #f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  เปลี่ยนเป็นเงินไวในรั้วมหาลัย
-                </span>
-              </h2>
-              <p style={{ fontSize: "13px", color: "#e0e7ff", margin: "0 0 20px 0" }}>
-                ซื้อง่าย ขายคล่อง ปลอดภัย นัดรับในมอได้ทันที
-              </p>
-              
-              <Link href="/add-product" style={{
-                background: "#ffffff",
-                color: "#4338ca",
-                padding: "12px 24px",
-                borderRadius: "16px",
-                fontWeight: "900",
-                fontSize: "13px",
-                textDecoration: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                boxShadow: "0 10px 20px rgba(0, 0, 0, 0.2)"
-              }}>
-                🚀 + ลงประกาศขายเลย
-              </Link>
-            </div>
+            </h2>
+            <p style={{ fontSize: "13px", color: "#e0e7ff", margin: "0 0 20px 0" }}>
+              ซื้อง่าย ขายคล่อง ปลอดภัย นัดรับในมอได้ทันที
+            </p>
+            
+            <a href="/add-product" style={{
+              background: "#ffffff",
+              color: "#4338ca",
+              padding: "12px 24px",
+              borderRadius: "16px",
+              fontWeight: "900",
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "inline-block",
+              boxShadow: "0 10px 20px rgba(0, 0, 0, 0.2)"
+            }}>
+              🚀 + ลงประกาศขายเลย
+            </a>
           </div>
         </section>
 
@@ -302,28 +226,24 @@ export default function HomePage() {
             style={{
               width: "100%",
               backgroundColor: theme.inputBg,
-              backdropFilter: "blur(12px)",
               border: `1px solid ${theme.border}`,
               color: theme.text,
               padding: "16px 20px",
               borderRadius: "20px",
               fontSize: "14px",
               outline: "none",
-              boxSizing: "border-box",
-              boxShadow: `0 10px 25px ${theme.shadow}`,
-              transition: "all 0.3s ease"
+              boxSizing: "border-box"
             }}
           />
         </div>
 
-        {/* Categories Scrollbar */}
+        {/* Categories Bar */}
         <div style={{
           display: "flex",
           gap: "10px",
           overflowX: "auto",
           paddingBottom: "12px",
-          marginBottom: "24px",
-          scrollbarWidth: "none"
+          marginBottom: "24px"
         }}>
           {categories.map((cat) => {
             const isActive = selectedCategory === cat.name;
@@ -333,7 +253,6 @@ export default function HomePage() {
                 onClick={() => setSelectedCategory(cat.name)}
                 style={{
                   backgroundColor: isActive ? "#6366f1" : theme.cardBg,
-                  backdropFilter: "blur(10px)",
                   color: isActive ? "#ffffff" : theme.subText,
                   border: isActive ? "1px solid #818cf8" : `1px solid ${theme.border}`,
                   padding: "10px 18px",
@@ -344,9 +263,7 @@ export default function HomePage() {
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: "6px",
-                  boxShadow: isActive ? "0 0 20px rgba(99, 102, 241, 0.5)" : "none",
-                  transition: "all 0.3s ease"
+                  gap: "6px"
                 }}
               >
                 <span>{cat.icon}</span>
@@ -365,8 +282,7 @@ export default function HomePage() {
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "20px",
-          perspective: "1200px"
+          gap: "16px"
         }}>
           {filteredProducts.map((product) => {
             const isHovered = hoveredCard === product.id;
@@ -378,32 +294,31 @@ export default function HomePage() {
                 style={{
                   backgroundColor: theme.cardBg,
                   backdropFilter: "blur(12px)",
-                  borderRadius: "28px",
+                  borderRadius: "24px",
                   border: isHovered ? "1px solid #818cf8" : `1px solid ${theme.border}`,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                   boxShadow: isHovered 
-                    ? "0 25px 40px rgba(99, 102, 241, 0.35)" 
-                    : `0 15px 30px ${theme.shadow}`,
-                  transform: isHovered ? "translateY(-8px) rotateX(6deg)" : "translateY(0) rotateX(0)",
-                  transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                    ? "0 20px 30px rgba(99, 102, 241, 0.3)" 
+                    : `0 10px 20px ${theme.shadow}`,
+                  transform: isHovered ? "translateY(-6px)" : "translateY(0)",
+                  transition: "all 0.3s ease",
                   cursor: "pointer"
                 }}
               >
-                {/* 3D POP-OUT IMAGE CONTAINER */}
+                {/* 3D FLOATING IMAGE CONTAINER */}
                 <div style={{
                   position: "relative",
-                  height: "150px",
+                  height: "140px",
                   borderRadius: "24px 24px 0 0",
-                  padding: "10px",
-                  perspective: "600px"
+                  padding: "8px"
                 }}>
                   <div style={{
                     width: "100%",
                     height: "100%",
-                    borderRadius: "20px",
-                    overflow: isHovered ? "visible" : "hidden",
+                    borderRadius: "18px",
+                    overflow: "hidden",
                     position: "relative"
                   }}>
                     <img
@@ -413,33 +328,29 @@ export default function HomePage() {
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
-                        borderRadius: "18px",
-                        transform: isHovered ? "scale(1.15) translateZ(30px) translateY(-10px)" : "scale(1) translateZ(0)",
-                        boxShadow: isHovered ? "0 20px 30px rgba(0,0,0,0.5)" : "none",
-                        transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+                        transform: isHovered ? "scale(1.1)" : "scale(1)",
+                        transition: "transform 0.3s ease"
                       }}
                     />
                   </div>
 
                   <span style={{
                     position: "absolute",
-                    top: "18px",
-                    left: "18px",
+                    top: "14px",
+                    left: "14px",
                     backgroundColor: "rgba(15, 23, 42, 0.85)",
-                    backdropFilter: "blur(8px)",
                     color: "#818cf8",
                     fontSize: "10px",
                     fontWeight: "800",
-                    padding: "4px 10px",
-                    borderRadius: "10px",
-                    border: "1px solid rgba(129, 140, 248, 0.3)",
-                    zIndex: 10
+                    padding: "4px 8px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(129, 140, 248, 0.3)"
                   }}>
                     {product.category}
                   </span>
                 </div>
 
-                <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", justifyBetween: "space-between" }}>
+                <div style={{ padding: "14px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div>
                     <h4 style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "700", color: theme.text, lineHeight: "1.4" }}>
                       {product.title}
@@ -447,7 +358,7 @@ export default function HomePage() {
                     <p style={{ margin: 0, fontSize: "11px", color: theme.subText }}>👤 {product.seller}</p>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", paddingTop: "12px", borderTop: `1px solid ${theme.border}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "14px", paddingTop: "10px", borderTop: `1px solid ${theme.border}` }}>
                     <div>
                       <span style={{ fontSize: "10px", color: theme.subText, display: "block" }}>ราคา</span>
                       <span style={{ fontSize: "16px", fontWeight: "900", background: "linear-gradient(to right, #6366f1, #ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
@@ -458,12 +369,10 @@ export default function HomePage() {
                       backgroundColor: isHovered ? "#6366f1" : "rgba(99, 102, 241, 0.15)",
                       border: "none",
                       color: isHovered ? "#ffffff" : "#6366f1",
-                      borderRadius: "12px",
-                      padding: "8px 12px",
+                      borderRadius: "10px",
+                      padding: "6px 10px",
                       fontSize: "12px",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease"
+                      fontWeight: "bold"
                     }}>
                       ➔
                     </button>
@@ -476,7 +385,7 @@ export default function HomePage() {
 
       </main>
 
-      {/* Experimental Floating Dock Navigation */}
+      {/* Floating Bottom Dock Navigation */}
       <nav style={{
         position: "fixed",
         bottom: "20px",
@@ -492,9 +401,8 @@ export default function HomePage() {
         display: "flex",
         justifyContent: "space-around",
         alignItems: "center",
-        boxShadow: `0 20px 40px ${theme.shadow}, 0 0 20px rgba(99, 102, 241, 0.2)`,
-        zIndex: 100,
-        transition: "all 0.4s ease"
+        boxShadow: `0 20px 40px ${theme.shadow}`,
+        zIndex: 100
       }}>
         {[
           { id: "home", label: "หน้าแรก", icon: "🏠" },
@@ -518,9 +426,7 @@ export default function HomePage() {
                 gap: "6px",
                 fontSize: "12px",
                 fontWeight: "bold",
-                cursor: "pointer",
-                boxShadow: isActive ? "0 0 15px rgba(99, 102, 241, 0.5)" : "none",
-                transition: "all 0.3s ease"
+                cursor: "pointer"
               }}
             >
               <span style={{ fontSize: "16px" }}>{nav.icon}</span>

@@ -1,107 +1,157 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { sampleProducts } from "@/data/products";
+
+interface Product {
+  id: number;
+  title: string;
+  price: number;
+  category: string;
+  seller: string;
+  image: string;
+}
+
+const sampleProducts: Product[] = [
+  {
+    id: 1,
+    title: "หนังสือเรียน Calculus 1 (สภาพ 90%)",
+    price: 180,
+    category: "หนังสือ",
+    seller: "ทีมอ 3",
+    image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80",
+  },
+  {
+    id: 2,
+    title: "เครื่องคิดเลขวิทยาศาสตร์ Casio FX-991EX",
+    price: 450,
+    category: "อุปกรณ์การเรียน",
+    seller: "บอส วิศวะ",
+    image: "https://images.unsplash.com/photo-1587145820266-a5951ee6f620?w=500&q=80",
+  },
+  {
+    id: 3,
+    title: "เสื้อโค้ท / แจ็กเก็ต ยูนิโคล่ ไซส์ M",
+    price: 320,
+    category: "เสื้อผ้า",
+    seller: "พลอย บัญชี",
+    image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500&q=80",
+  },
+  {
+    id: 4,
+    title: "จักรยานปั่นในมหาลัย สภาพดีพร้อมปั่น",
+    price: 850,
+    category: "ของใช้หอพัก",
+    seller: "กอล์ฟ สถาปัตย์",
+    image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=500&q=80",
+  },
+];
 
 export default function HomePage() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Sync state กับ class 'dark' บนแท็ก <html> ของ Document
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
-  
-  const filteredProducts = sampleProducts.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.category.toLowerCase().includes(search.toLowerCase())
+  const filteredProducts = sampleProducts.filter((item) =>
+    item.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-      
-      {/* Header Navigation */}
-      <header className="sticky top-0 z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="font-extrabold text-lg text-blue-600 dark:text-blue-400">
-          🎓 CampusMarket
-        </Link>
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="p-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition"
-        >
-          {darkMode ? "☀️ Light" : "🌙 Dark"}
-        </button>
-      </header>
+    <div style={{ backgroundColor: "#0b1329", minHeight: "100vh", color: "#ffffff", paddingBottom: "40px", fontFamily: "sans-serif" }}>
+      <div style={{ maxWidth: "768px", margin: "0 auto", padding: "20px 16px" }}>
+        
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <div>
+            <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: 0, color: "#ffffff" }}>Campus Market</h1>
+            <p style={{ fontSize: "14px", color: "#94a3b8", margin: "4px 0 0 0" }}>ตลาดนัดเด็กวิทยาลัย</p>
+          </div>
+          <button style={{ backgroundColor: "#1e293b", border: "1px solid #334155", color: "#fff", padding: "8px 16px", borderRadius: "20px", fontSize: "14px", cursor: "pointer" }}>
+            👤 เข้าสู่ระบบ
+          </button>
+        </div>
 
-      <main className="max-w-md mx-auto p-4 space-y-4">
-        {/* Search Bar */}
-        <div className="relative">
+        {/* Search */}
+        <div style={{ marginBottom: "20px" }}>
           <input
             type="text"
-            placeholder="ค้นหาสินค้า, หนังสือ, อุปกรณ์..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="🔍 ค้นหาสินค้า เช่น หนังสือ, เครื่องคิดเลข..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "12px 16px",
+              borderRadius: "12px",
+              border: "1px solid #334155",
+              backgroundColor: "#1e293b",
+              color: "#ffffff",
+              fontSize: "14px",
+              outline: "none",
+              boxSizing: "border-box"
+            }}
           />
         </div>
 
-        {/* Banner / CTA */}
-        <div className="flex items-center justify-between p-4 bg-blue-600 text-white rounded-2xl shadow-md">
+        {/* Banner */}
+        <div style={{ backgroundColor: "#1d4ed8", borderRadius: "16px", padding: "20px", marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)" }}>
           <div>
-            <p className="font-bold text-base">มีของไม่ได้ใช้ไหม?</p>
-            <p className="text-xs text-blue-100">นำมาลงขายให้เพื่อนๆ ในวิทยาลัยได้เลย</p>
+            <h2 style={{ fontSize: "18px", fontWeight: "bold", margin: "0 0 4px 0", color: "#ffffff" }}>มีของไม่ได้ใช้ไหม?</h2>
+            <p style={{ fontSize: "13px", color: "#dbeafe", margin: 0 }}>นำมาลงขายให้เพื่อนๆ ในวิทยาลัยได้เลยง่ายๆ</p>
           </div>
-          <Link
-            href="/product"
-            className="px-3 py-2 bg-white text-blue-600 font-bold text-xs rounded-xl shadow hover:bg-blue-50"
-          >
-            + ลงขาย
-          </Link>
+          <button style={{ backgroundColor: "#ffffff", color: "#0f172a", border: "none", padding: "8px 16px", borderRadius: "20px", fontWeight: "bold", fontSize: "13px", cursor: "pointer" }}>
+            + ลงขายเลย
+          </button>
         </div>
 
-        {/* Feed Title */}
-        <h2 className="font-bold text-base pt-2">รายการสินค้าล่าสุด</h2>
-
         {/* Product Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "16px", color: "#ffffff" }}>
+          สินค้าล่าสุด ({filteredProducts.length})
+        </h3>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col justify-between"
+              style={{
+                backgroundColor: "#1e293b",
+                borderRadius: "16px",
+                overflow: "hidden",
+                border: "1px solid #334155",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}
             >
-              <div>
+              <div style={{ height: "180px", width: "100%", backgroundColor: "#334155" }}>
                 <img
                   src={product.image}
                   alt={product.title}
-                  className="w-full h-32 object-cover"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
-                <div className="p-3">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-blue-50 dark:bg-slate-700 text-blue-600 dark:text-blue-300 rounded-md">
+              </div>
+
+              <div style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div>
+                  <span style={{ backgroundColor: "#334155", color: "#cbd5e1", fontSize: "11px", padding: "4px 8px", borderRadius: "6px", fontWeight: "500" }}>
                     {product.category}
                   </span>
-                  <h3 className="font-medium text-xs mt-1.5 line-clamp-2">
+                  <h4 style={{ fontSize: "14px", fontWeight: "600", color: "#f8fafc", margin: "8px 0 12px 0", lineHeight: "1.4" }}>
                     {product.title}
-                  </h3>
+                  </h4>
                 </div>
-              </div>
-              <div className="p-3 pt-0 flex items-center justify-between">
-                <span className="font-bold text-blue-600 dark:text-blue-400 text-sm">
-                  ฿{product.price.toLocaleString()}
-                </span>
-                <span className="text-[10px] text-gray-400">
-                  {product.seller}
-                </span>
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "8px", borderTop: "1px solid #334155" }}>
+                  <span style={{ color: "#60a5fa", fontWeight: "bold", fontSize: "16px" }}>
+                    ฿{product.price}
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                    {product.seller}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
         </div>
-      </main>
+
+      </div>
     </div>
   );
 }
-

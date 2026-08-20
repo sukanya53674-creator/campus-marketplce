@@ -12,6 +12,9 @@ interface Product {
   image: string;
 }
 
+
+
+gg
 const sampleProducts: Product[] = [
   {
     id: 1,

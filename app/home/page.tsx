@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, X, Rotate3d, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
 
 interface Product {
@@ -24,7 +24,7 @@ const PRODUCTS: Product[] = [
     is3D: true,
     isHot: true,
     image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=60',
-    glowColor: 'rgba(99, 102, 241, 0.35)',
+    glowColor: 'rgba(99, 102, 241, 0.45)',
     condition: 'สภาพ 95%+',
   },
   {
@@ -35,7 +35,7 @@ const PRODUCTS: Product[] = [
     is3D: true,
     isHot: false,
     image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=500&auto=format&fit=crop&q=60',
-    glowColor: 'rgba(236, 72, 153, 0.35)',
+    glowColor: 'rgba(236, 72, 153, 0.45)',
     condition: 'สภาพ 90%+',
   },
   {
@@ -46,7 +46,7 @@ const PRODUCTS: Product[] = [
     is3D: true,
     isHot: true,
     image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&auto=format&fit=crop&q=60',
-    glowColor: 'rgba(59, 130, 246, 0.35)',
+    glowColor: 'rgba(59, 130, 246, 0.45)',
     condition: 'สภาพ 98%+',
   },
   {
@@ -57,7 +57,7 @@ const PRODUCTS: Product[] = [
     is3D: false,
     isHot: true,
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=60',
-    glowColor: 'rgba(245, 158, 11, 0.35)',
+    glowColor: 'rgba(245, 158, 11, 0.45)',
     condition: 'สภาพ 92%+',
   },
   {
@@ -68,7 +68,7 @@ const PRODUCTS: Product[] = [
     is3D: true,
     isHot: false,
     image: 'https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=500&auto=format&fit=crop&q=60',
-    glowColor: 'rgba(16, 185, 129, 0.35)',
+    glowColor: 'rgba(16, 185, 129, 0.45)',
     condition: 'ของใหม่ มือ 1',
   },
 ];
@@ -79,12 +79,23 @@ export default function ProductSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [cardState, setCardState] = useState<{ [key: number]: { x: number; y: number; mouseX: number; mouseY: number } }>({});
 
+  // Global Mouse Tracking State (Mouse Light Effect)
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+
   // 3D Interactive State
   const [active3DModal, setActive3DModal] = useState<Product | null>(null);
   const [rotation, setRotation] = useState({ x: 15, y: -25 });
   const [zoom, setZoom] = useState<number>(1);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const dragStart = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
+  }, []);
 
   const filteredProducts = PRODUCTS.filter((item) => {
     if (selectedCategory === '3d') return item.is3D;
@@ -98,8 +109,8 @@ export default function ProductSection() {
     const y = e.clientY - rect.top;
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
+    const rotateX = ((y - centerY) / centerY) * -12;
+    const rotateY = ((x - centerX) / centerX) * 12;
 
     setCardState((prev) => ({
       ...prev,
@@ -143,18 +154,30 @@ export default function ProductSection() {
 
   const theme = {
     bg: isDarkMode ? '#070a12' : '#f8fafc',
-    cardBg: isDarkMode ? 'rgba(15, 23, 42, 0.6)' : 'rgba(255, 255, 255, 0.8)',
+    cardBg: isDarkMode ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
     textPrimary: isDarkMode ? '#ffffff' : '#0f172a',
     textSecondary: isDarkMode ? '#94a3b8' : '#64748b',
     border: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
-    borderHover: isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(99, 102, 241, 0.4)',
+    borderHover: isDarkMode ? 'rgba(255, 255, 255, 0.35)' : 'rgba(99, 102, 241, 0.45)',
     dockBg: isDarkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
     shadow: isDarkMode ? '0 15px 30px rgba(0,0,0,0.6)' : '0 10px 25px rgba(0,0,0,0.05)',
   };
 
   return (
-    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '24px', color: theme.textPrimary, fontFamily: 'sans-serif', transition: 'background-color 0.3s' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '24px', color: theme.textPrimary, fontFamily: 'sans-serif', transition: 'background-color 0.3s', position: 'relative', overflow: 'hidden' }}>
+      
+      {/* Dynamic Cursor Light Spotlight Effect */}
+      <div
+        style={{
+          pointerEvents: 'none',
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1,
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(99, 102, 241, 0.12)' : 'rgba(99, 102, 241, 0.06)'}, transparent 80%)`,
+        }}
+      />
+
+      <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative', zIndex: 2 }}>
         
         {/* Navigation & Theme Switcher */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
@@ -267,7 +290,7 @@ export default function ProductSection() {
           </span>
         </div>
 
-        {/* Product Grid */}
+        {/* Product Grid with Interactive Mouse Card Effects */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px', perspective: '1200px' }}>
           {filteredProducts.map((item) => {
             const state = cardState[item.id] || { x: 0, y: 0, mouseX: 0, mouseY: 0 };
@@ -287,25 +310,27 @@ export default function ProductSection() {
                   backgroundColor: theme.cardBg,
                   border: isHovered ? `1px solid ${theme.borderHover}` : `1px solid ${theme.border}`,
                   padding: '16px',
-                  transition: 'all 0.2s ease-out',
+                  transition: isHovered ? 'transform 0.05s linear' : 'all 0.3s ease-out',
                   backdropFilter: 'blur(20px)',
-                  boxShadow: theme.shadow,
+                  boxShadow: isHovered ? `0 20px 40px -10px ${item.glowColor}` : theme.shadow,
                   cursor: 'pointer',
                   overflow: 'hidden'
                 }}
               >
+                {/* Mouse Tracking Radial Spotlight */}
                 <div
                   style={{
                     pointerEvents: 'none',
                     position: 'absolute',
                     inset: 0,
                     opacity: isHovered ? 1 : 0,
-                    transition: 'opacity 0.3s',
-                    background: `radial-gradient(300px circle at ${state.mouseX}px ${state.mouseY}px, ${item.glowColor}, transparent 80%)`,
+                    transition: 'opacity 0.2s',
+                    background: `radial-gradient(280px circle at ${state.mouseX}px ${state.mouseY}px, ${item.glowColor}, transparent 80%)`,
                     zIndex: 0
                   }}
                 />
 
+                {/* Card Image Wrapper */}
                 <div style={{
                   transform: 'translateZ(25px)',
                   position: 'relative',
@@ -442,7 +467,7 @@ export default function ProductSection() {
         </div>
       </div>
 
-      {/* FIXED 3D INTERACTIVE MODAL WITH ENHANCED DEPTH */}
+      {/* 3D INTERACTIVE MODAL */}
       {active3DModal && (
         <div style={{
           position: 'fixed',
@@ -468,7 +493,6 @@ export default function ProductSection() {
             gap: '16px',
             boxShadow: '0 25px 60px rgba(0,0,0,0.7)'
           }}>
-            {/* Modal Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Rotate3d style={{ width: '22px', height: '22px', color: '#06b6d4' }} />
@@ -495,7 +519,6 @@ export default function ProductSection() {
               </button>
             </div>
 
-            {/* 3D Canvas Area */}
             <div
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
@@ -516,7 +539,6 @@ export default function ProductSection() {
                 userSelect: 'none'
               }}
             >
-              {/* Floor Pattern */}
               <div style={{
                 position: 'absolute',
                 width: '100%',
@@ -526,7 +548,6 @@ export default function ProductSection() {
                 pointerEvents: 'none'
               }} />
 
-              {/* Dynamic Pedestal Ground Shadow */}
               <div style={{
                 position: 'absolute',
                 width: '260px',
@@ -539,7 +560,6 @@ export default function ProductSection() {
                 transition: isDragging ? 'none' : 'transform 0.1s ease-out'
               }} />
 
-              {/* Rotatable 3D Extruded Object */}
               <div style={{
                 transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${zoom})`,
                 transformStyle: 'preserve-3d',
@@ -549,7 +569,6 @@ export default function ProductSection() {
                 justifyContent: 'center',
                 position: 'relative'
               }}>
-                {/* Back Extrusion Layer 2 */}
                 <div style={{
                   position: 'absolute',
                   width: '260px',
@@ -560,7 +579,6 @@ export default function ProductSection() {
                   boxShadow: '0 0 20px rgba(0,0,0,0.8)'
                 }} />
 
-                {/* Back Extrusion Layer 1 */}
                 <div style={{
                   position: 'absolute',
                   width: '260px',
@@ -570,7 +588,6 @@ export default function ProductSection() {
                   transform: 'translateZ(-6px)'
                 }} />
 
-                {/* Main Front Layer */}
                 <img
                   src={active3DModal.image}
                   alt={active3DModal.title}
@@ -586,7 +603,6 @@ export default function ProductSection() {
                   }}
                 />
 
-                {/* Holographic Specular Lighting */}
                 <div style={{
                   position: 'absolute',
                   inset: 0,
@@ -599,7 +615,6 @@ export default function ProductSection() {
                 }} />
               </div>
 
-              {/* Helper Hint */}
               <div style={{
                 position: 'absolute',
                 bottom: '16px',
@@ -618,7 +633,6 @@ export default function ProductSection() {
                 🖱️ คลิกแล้วลากเมาส์เพื่อหมุนภาพ 360°
               </div>
 
-              {/* Control Buttons */}
               <div style={{
                 position: 'absolute',
                 bottom: '16px',
@@ -648,7 +662,6 @@ export default function ProductSection() {
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px' }}>
               <div>
                 <p style={{ fontSize: '11px', color: theme.textSecondary, margin: 0 }}>ราคาสินค้า</p>

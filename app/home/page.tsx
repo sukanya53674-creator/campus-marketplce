@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, X, Rotate3d } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, X, Rotate3d, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
 
 const PRODUCTS = [
   {
@@ -65,8 +65,14 @@ export default function ProductSection() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<'all' | '3d' | 'hot'>('all');
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [active3DModal, setActive3DModal] = useState<typeof PRODUCTS[0] | null>(null);
   const [cardState, setCardState] = useState<{ [key: number]: { x: number; y: number; mouseX: number; mouseY: number } }>({});
+
+  // 3D Viewer Modal State & Interaction
+  const [active3DModal, setActive3DModal] = useState<typeof PRODUCTS[0] | null>(null);
+  const [rotation, setRotation] = useState({ x: 15, y: -25 });
+  const [zoom, setZoom] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0 });
 
   const filteredProducts = PRODUCTS.filter((item) => {
     if (selectedCategory === '3d') return item.is3D;
@@ -97,7 +103,33 @@ export default function ProductSection() {
     setHoveredCard(null);
   };
 
-  // Theme Styles
+  // 3D Drag Rotation Logic
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    dragStart.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - dragStart.current.x;
+    const deltaY = e.clientY - dragStart.current.y;
+
+    setRotation((prev) => ({
+      x: Math.max(-60, Math.min(60, prev.x - deltaY * 0.5)),
+      y: prev.y + deltaX * 0.8,
+    }));
+
+    dragStart.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
+
+  const open3DModal = (product: typeof PRODUCTS[0]) => {
+    setActive3DModal(product);
+    setRotation({ x: 15, y: -25 });
+    setZoom(1);
+  };
+
   const theme = {
     bg: isDarkMode ? '#070a12' : '#f8fafc',
     cardBg: isDarkMode ? 'rgba(15, 23, 42, 0.6)' : 'rgba(255, 255, 255, 0.8)',
@@ -113,10 +145,8 @@ export default function ProductSection() {
     <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '24px', color: theme.textPrimary, fontFamily: 'sans-serif', transition: 'background-color 0.3s' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
-        {/* Navigation & Theme Toggle Bar */}
+        {/* Navigation & Theme Bar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          
-          {/* Floating Category Dock */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -193,7 +223,6 @@ export default function ProductSection() {
             </button>
           </div>
 
-          {/* Day / Night Mode Button */}
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
             style={{
@@ -209,7 +238,6 @@ export default function ProductSection() {
               fontWeight: 600,
               fontSize: '12px',
               boxShadow: theme.shadow,
-              transition: 'all 0.3s'
             }}
           >
             {isDarkMode ? <Sun style={{ width: '16px', height: '16px', color: '#fbbf24' }} /> : <Moon style={{ width: '16px', height: '16px', color: '#6366f1' }} />}
@@ -255,7 +283,6 @@ export default function ProductSection() {
                   overflow: 'hidden'
                 }}
               >
-                {/* Spotlight Glow */}
                 <div
                   style={{
                     pointerEvents: 'none',
@@ -268,7 +295,6 @@ export default function ProductSection() {
                   }}
                 />
 
-                {/* Product Image Frame */}
                 <div style={{
                   transform: 'translateZ(25px)',
                   position: 'relative',
@@ -291,7 +317,6 @@ export default function ProductSection() {
                     }}
                   />
 
-                  {/* 3D Tag */}
                   {item.is3D && (
                     <div style={{
                       position: 'absolute',
@@ -312,7 +337,6 @@ export default function ProductSection() {
                     </div>
                   )}
 
-                  {/* Hot Tag */}
                   {item.isHot && (
                     <div style={{
                       position: 'absolute',
@@ -333,7 +357,6 @@ export default function ProductSection() {
                     </div>
                   )}
 
-                  {/* Quick Action Button */}
                   <div style={{
                     position: 'absolute',
                     inset: 0,
@@ -346,7 +369,7 @@ export default function ProductSection() {
                     transition: 'all 0.3s'
                   }}>
                     <button
-                      onClick={() => setActive3DModal(item)}
+                      onClick={() => open3DModal(item)}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -362,12 +385,11 @@ export default function ProductSection() {
                         boxShadow: '0 0 20px rgba(99,102,241,0.6)'
                       }}
                     >
-                      <Eye style={{ width: '16px', height: '16px' }} /> ดูโมเดล 3D แบบเต็มตา
+                      <Eye style={{ width: '16px', height: '16px' }} /> กดหมุนโมเดล 3D
                     </button>
                   </div>
                 </div>
 
-                {/* Details */}
                 <div style={{ transform: 'translateZ(20px)', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{
@@ -409,14 +431,14 @@ export default function ProductSection() {
         </div>
       </div>
 
-      {/* 3D Interactive Modal Viewer */}
+      {/* 360° INTERACTIVE ROTATABLE 3D MODAL */}
       {active3DModal && (
         <div style={{
           position: 'fixed',
           inset: 0,
           zIndex: 50,
           backgroundColor: 'rgba(0,0,0,0.85)',
-          backdropFilter: 'blur(12px)',
+          backdropFilter: 'blur(16px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -425,20 +447,20 @@ export default function ProductSection() {
           <div style={{
             position: 'relative',
             width: '100%',
-            maxWidth: '650px',
+            maxWidth: '700px',
             backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-            borderRadius: '24px',
+            borderRadius: '28px',
             border: `1px solid ${theme.border}`,
             padding: '24px',
             display: 'flex',
             flexDirection: 'column',
             gap: '16px',
-            boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
+            boxShadow: '0 25px 60px rgba(0,0,0,0.7)'
           }}>
-            {/* Modal Header */}
+            {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Rotate3d style={{ width: '20px', height: '20px', color: '#06b6d4' }} />
+                <Rotate3d style={{ width: '22px', height: '22px', color: '#06b6d4' }} />
                 <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: theme.textPrimary }}>
                   3D Interactive Viewer: {active3DModal.title}
                 </h3>
@@ -446,70 +468,143 @@ export default function ProductSection() {
               <button
                 onClick={() => setActive3DModal(null)}
                 style={{
-                  backgroundColor: 'transparent',
+                  backgroundColor: 'rgba(255,255,255,0.1)',
                   border: 'none',
-                  color: theme.textSecondary,
+                  color: theme.textPrimary,
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   cursor: 'pointer',
-                  padding: '4px'
                 }}
               >
-                <X style={{ width: '20px', height: '20px' }} />
+                <X style={{ width: '18px', height: '18px' }} />
               </button>
             </div>
 
-            {/* Simulated 3D View Screen */}
-            <div style={{
-              position: 'relative',
-              width: '100%',
-              height: '320px',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              backgroundColor: isDarkMode ? '#020617' : '#f1f5f9',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <img
-                src={active3DModal.image}
-                alt={active3DModal.title}
-                style={{
-                  width: '80%',
-                  height: '80%',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.5))'
-                }}
-              />
+            {/* 3D Interactive Canvas Area */}
+            <div
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '360px',
+                borderRadius: '20px',
+                overflow: 'hidden',
+                backgroundColor: isDarkMode ? '#020617' : '#f1f5f9',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                perspective: '1000px',
+                cursor: isDragging ? 'grabbing' : 'grab',
+                userSelect: 'none'
+              }}
+            >
+              {/* Floor Grid Pattern */}
               <div style={{
                 position: 'absolute',
-                bottom: '12px',
-                backgroundColor: 'rgba(0,0,0,0.6)',
-                color: '#ffffff',
+                width: '100%',
+                height: '100%',
+                backgroundImage: 'radial-gradient(circle, rgba(99,102,241,0.15) 1px, transparent 1px)',
+                backgroundSize: '20px 20px',
+                pointerEvents: 'none'
+              }} />
+
+              {/* Rotatable 3D Object Container */}
+              <div style={{
+                transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${zoom})`,
+                transformStyle: 'preserve-3d',
+                transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <img
+                  src={active3DModal.image}
+                  alt={active3DModal.title}
+                  draggable={false}
+                  style={{
+                    maxWidth: '260px',
+                    maxHeight: '260px',
+                    objectFit: 'contain',
+                    borderRadius: '16px',
+                    boxShadow: '0 30px 60px rgba(0,0,0,0.6)',
+                    border: '2px solid rgba(255,255,255,0.2)'
+                  }}
+                />
+              </div>
+
+              {/* Interactive Hints Overlay */}
+              <div style={{
+                position: 'absolute',
+                bottom: '16px',
+                left: '16px',
+                backgroundColor: 'rgba(2, 6, 23, 0.75)',
+                color: '#67e8f9',
                 fontSize: '11px',
+                fontWeight: 600,
                 padding: '6px 14px',
                 borderRadius: '20px',
-                backdropFilter: 'blur(4px)'
+                backdropFilter: 'blur(8px)',
+                pointerEvents: 'none',
+                border: '1px solid rgba(6,182,212,0.3)'
               }}>
-                🖱️ หมุนมุมมองและขยายภาพได้แบบ 360°
+                🖱️ คลิกแล้วลากเมาส์เพื่อหมุนภาพ 360°
+              </div>
+
+              {/* View Controls */}
+              <div style={{
+                position: 'absolute',
+                bottom: '16px',
+                right: '16px',
+                display: 'flex',
+                gap: '8px',
+                zIndex: 10
+              }}>
+                <button
+                  onClick={() => setZoom((z) => Math.min(z + 0.2, 1.8))}
+                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(2,6,23,0.8)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
+                >
+                  <ZoomIn style={{ width: '16px', height: '16px' }} />
+                </button>
+                <button
+                  onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
+                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(2,6,23,0.8)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
+                >
+                  <ZoomOut style={{ width: '16px', height: '16px' }} />
+                </button>
+                <button
+                  onClick={() => { setRotation({ x: 15, y: -25 }); setZoom(1); }}
+                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(2,6,23,0.8)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
+                >
+                  <RefreshCw style={{ width: '16px', height: '16px' }} />
+                </button>
               </div>
             </div>
 
             {/* Modal Bottom Info */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px' }}>
               <div>
-                <span style={{ fontSize: '12px', color: theme.textSecondary }}>ราคา</span>
-                <p style={{ fontSize: '20px', fontWeight: 900, color: '#8b5cf6', margin: 0 }}>{active3DModal.price}</p>
+                <p style={{ fontSize: '11px', color: theme.textSecondary, margin: 0 }}>ราคาสินค้า</p>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#c084fc' }}>{active3DModal.price}</span>
               </div>
               <button style={{
-                padding: '10px 24px',
-                backgroundColor: '#4f46e5',
+                padding: '12px 28px',
+                background: 'linear-gradient(to right, #4f46e5, #9333ea)',
                 color: '#ffffff',
                 border: 'none',
-                borderRadius: '12px',
+                borderRadius: '14px',
                 fontWeight: 700,
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                boxShadow: '0 0 20px rgba(99,102,241,0.5)'
               }}>
-                ติดต่อซื้อสินค้า
+                ติดต่อสั่งซื้อทันที
               </button>
             </div>
           </div>

@@ -79,10 +79,8 @@ export default function ProductSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [cardState, setCardState] = useState<{ [key: number]: { x: number; y: number; mouseX: number; mouseY: number } }>({});
 
-  // Global Mouse Tracking State (Mouse Light Effect)
   const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
 
-  // 3D Interactive State
   const [active3DModal, setActive3DModal] = useState<Product | null>(null);
   const [rotation, setRotation] = useState({ x: 15, y: -25 });
   const [zoom, setZoom] = useState<number>(1);
@@ -166,7 +164,7 @@ export default function ProductSection() {
   return (
     <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '24px', color: theme.textPrimary, fontFamily: 'sans-serif', transition: 'background-color 0.3s', position: 'relative', overflow: 'hidden' }}>
       
-      {/* Dynamic Cursor Light Spotlight Effect */}
+      {/* Dynamic Cursor Light Spotlight */}
       <div
         style={{
           pointerEvents: 'none',
@@ -179,7 +177,7 @@ export default function ProductSection() {
 
       <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative', zIndex: 2 }}>
         
-        {/* Navigation & Theme Switcher */}
+        {/* Navigation & Theme Toggle (Icon Only) */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{
             display: 'flex',
@@ -257,25 +255,30 @@ export default function ProductSection() {
             </button>
           </div>
 
+          {/* ICON-ONLY Theme Toggle Button */}
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
+            title={isDarkMode ? 'สลับเป็นโหมดกลางวัน' : 'สลับเป็นโหมดกลางคืน'}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '10px 18px',
+              justifyContent: 'center',
+              width: '42px',
+              height: '42px',
               borderRadius: '14px',
               backgroundColor: theme.dockBg,
               border: `1px solid ${theme.border}`,
               color: theme.textPrimary,
               cursor: 'pointer',
-              fontWeight: 600,
-              fontSize: '12px',
               boxShadow: theme.shadow,
+              transition: 'all 0.3s ease',
             }}
           >
-            {isDarkMode ? <Sun style={{ width: '16px', height: '16px', color: '#fbbf24' }} /> : <Moon style={{ width: '16px', height: '16px', color: '#6366f1' }} />}
-            {isDarkMode ? 'โหมดกลางวัน' : 'โหมดกลางคืน'}
+            {isDarkMode ? (
+              <Sun style={{ width: '20px', height: '20px', color: '#fbbf24', filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.6))' }} />
+            ) : (
+              <Moon style={{ width: '20px', height: '20px', color: '#6366f1', filter: 'drop-shadow(0 0 6px rgba(99, 102, 241, 0.6))' }} />
+            )}
           </button>
         </div>
 
@@ -290,7 +293,7 @@ export default function ProductSection() {
           </span>
         </div>
 
-        {/* Product Grid with Interactive Mouse Card Effects */}
+        {/* Product Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px', perspective: '1200px' }}>
           {filteredProducts.map((item) => {
             const state = cardState[item.id] || { x: 0, y: 0, mouseX: 0, mouseY: 0 };
@@ -317,7 +320,6 @@ export default function ProductSection() {
                   overflow: 'hidden'
                 }}
               >
-                {/* Mouse Tracking Radial Spotlight */}
                 <div
                   style={{
                     pointerEvents: 'none',
@@ -330,7 +332,6 @@ export default function ProductSection() {
                   }}
                 />
 
-                {/* Card Image Wrapper */}
                 <div style={{
                   transform: 'translateZ(25px)',
                   position: 'relative',

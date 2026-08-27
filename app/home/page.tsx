@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { 
   Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, 
-  X, Rotate3d, ZoomIn, ZoomOut, RefreshCw, Search, Heart, ShoppingBag, Filter
+  X, Rotate3d, ZoomIn, ZoomOut, RefreshCw, Search, Heart, ShoppingBag
 } from 'lucide-react';
 
 interface Product {
@@ -19,6 +19,7 @@ interface Product {
   condition: string;
 }
 
+// ใช้ CDN รูปภาพ Picsum ที่มีความเสถียรและโหลดได้แน่นอน 100%
 const PRODUCTS: Product[] = [
   {
     id: 1,
@@ -27,8 +28,8 @@ const PRODUCTS: Product[] = [
     category: 'หนังสือ',
     is3D: true,
     isHot: true,
-    imageDay: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=60',
-    imageNight: 'https://images.unsplash.com/photo-1507842229415-46eb51079532?w=500&auto=format&fit=crop&q=60',
+    imageDay: 'https://picsum.photos/id/24/600/400',
+    imageNight: 'https://picsum.photos/id/24/600/400',
     glowColor: 'rgba(99, 102, 241, 0.45)',
     condition: 'สภาพ 95%+',
   },
@@ -39,8 +40,8 @@ const PRODUCTS: Product[] = [
     category: 'อุปกรณ์การเรียน',
     is3D: true,
     isHot: false,
-    imageDay: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?w=500&auto=format&fit=crop&q=60',
-    imageNight: 'https://images.unsplash.com/photo-1611125832047-1d7ad1e8e49f?w=500&auto=format&fit=crop&q=60',
+    imageDay: 'https://picsum.photos/id/160/600/400',
+    imageNight: 'https://picsum.photos/id/160/600/400',
     glowColor: 'rgba(236, 72, 153, 0.45)',
     condition: 'สภาพ 90%+',
   },
@@ -51,8 +52,8 @@ const PRODUCTS: Product[] = [
     category: 'ไอที & ไอแพด',
     is3D: true,
     isHot: true,
-    imageDay: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&auto=format&fit=crop&q=60',
-    imageNight: 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=500&auto=format&fit=crop&q=60',
+    imageDay: 'https://picsum.photos/id/0/600/400',
+    imageNight: 'https://picsum.photos/id/0/600/400',
     glowColor: 'rgba(59, 130, 246, 0.45)',
     condition: 'สภาพ 98%+',
   },
@@ -63,8 +64,8 @@ const PRODUCTS: Product[] = [
     category: 'อุปกรณ์การเรียน',
     is3D: false,
     isHot: true,
-    imageDay: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=60',
-    imageNight: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&auto=format&fit=crop&q=60',
+    imageDay: 'https://picsum.photos/id/48/600/400',
+    imageNight: 'https://picsum.photos/id/48/600/400',
     glowColor: 'rgba(245, 158, 11, 0.45)',
     condition: 'สภาพ 92%+',
   },
@@ -75,8 +76,8 @@ const PRODUCTS: Product[] = [
     category: 'ของใช้ในหอ',
     is3D: true,
     isHot: false,
-    imageDay: 'https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?w=500&auto=format&fit=crop&q=60',
-    imageNight: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&auto=format&fit=crop&q=60',
+    imageDay: 'https://picsum.photos/id/201/600/400',
+    imageNight: 'https://picsum.photos/id/201/600/400',
     glowColor: 'rgba(16, 185, 129, 0.45)',
     condition: 'ของใหม่ มือ 1',
   },
@@ -199,9 +200,9 @@ export default function ProductSection() {
 
       {/* Floating Cyber Particles Effect */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1 }}>
-        <div style={{ position: 'absolute', top: '10%', left: '20%', width: '4px', height: '4px', backgroundColor: '#818cf8', borderRadius: '50%', boxShadow: '0 0 12px #818cf8', animation: 'pulse 3s infinite' }} />
-        <div style={{ position: 'absolute', top: '60%', right: '15%', width: '6px', height: '6px', backgroundColor: '#38bdf8', borderRadius: '50%', boxShadow: '0 0 15px #38bdf8', animation: 'pulse 4s infinite' }} />
-        <div style={{ position: 'absolute', bottom: '15%', left: '30%', width: '5px', height: '5px', backgroundColor: '#c084fc', borderRadius: '50%', boxShadow: '0 0 14px #c084fc', animation: 'pulse 2.5s infinite' }} />
+        <div style={{ position: 'absolute', top: '10%', left: '20%', width: '4px', height: '4px', backgroundColor: '#818cf8', borderRadius: '50%', boxShadow: '0 0 12px #818cf8' }} />
+        <div style={{ position: 'absolute', top: '60%', right: '15%', width: '6px', height: '6px', backgroundColor: '#38bdf8', borderRadius: '50%', boxShadow: '0 0 15px #38bdf8' }} />
+        <div style={{ position: 'absolute', bottom: '15%', left: '30%', width: '5px', height: '5px', backgroundColor: '#c084fc', borderRadius: '50%', boxShadow: '0 0 14px #c084fc' }} />
       </div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px', position: 'relative', zIndex: 2 }}>
@@ -290,7 +291,6 @@ export default function ProductSection() {
 
           {/* Right Action Tools: Search & Theme Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Interactive Search Bar */}
             <div style={{
               position: 'relative',
               display: 'flex',
@@ -327,7 +327,6 @@ export default function ProductSection() {
               )}
             </div>
 
-            {/* Dark/Light Theme Toggle Button */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               title={isDarkMode ? 'สลับเป็นโหมดกลางวัน' : 'สลับเป็นโหมดกลางคืน'}
@@ -348,9 +347,9 @@ export default function ProductSection() {
               }}
             >
               {isDarkMode ? (
-                <Sun style={{ width: '20px', height: '20px', color: '#fbbf24', filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.8))' }} />
+                <Sun style={{ width: '20px', height: '20px', color: '#fbbf24' }} />
               ) : (
-                <Moon style={{ width: '20px', height: '20px', color: '#4f46e5', filter: 'drop-shadow(0 0 8px rgba(79, 70, 229, 0.6))' }} />
+                <Moon style={{ width: '20px', height: '20px', color: '#4f46e5' }} />
               )}
             </button>
           </div>
@@ -465,7 +464,7 @@ export default function ProductSection() {
                     }}
                   />
 
-                  {/* 3D Model Badge */}
+                  {/* Badges */}
                   {item.is3D && (
                     <div style={{
                       position: 'absolute',
@@ -487,7 +486,6 @@ export default function ProductSection() {
                     </div>
                   )}
 
-                  {/* Hot Badge */}
                   {item.isHot && !item.is3D && (
                     <div style={{
                       position: 'absolute',
@@ -545,7 +543,7 @@ export default function ProductSection() {
                   </div>
                 </div>
 
-                {/* Product Information */}
+                {/* Product Info */}
                 <div style={{ transform: 'translateZ(25px)', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{
@@ -669,20 +667,6 @@ export default function ProductSection() {
               }} />
 
               <div style={{
-                position: 'absolute',
-                width: '280px',
-                height: '80px',
-                borderRadius: '50%',
-                background: isDarkMode 
-                  ? 'radial-gradient(ellipse at center, rgba(99, 102, 241, 0.45) 0%, rgba(0,0,0,0.8) 70%, transparent 100%)' 
-                  : 'radial-gradient(ellipse at center, rgba(99, 102, 241, 0.3) 0%, rgba(226,232,240,0.8) 70%, transparent 100%)',
-                transform: `translateY(130px) rotateX(75deg) scale(${zoom})`,
-                filter: 'blur(14px)',
-                pointerEvents: 'none',
-                transition: isDragging ? 'none' : 'transform 0.1s ease-out'
-              }} />
-
-              <div style={{
                 transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${zoom})`,
                 transformStyle: 'preserve-3d',
                 transition: isDragging ? 'none' : 'transform 0.1s ease-out',
@@ -691,25 +675,6 @@ export default function ProductSection() {
                 justifyContent: 'center',
                 position: 'relative'
               }}>
-                <div style={{
-                  position: 'absolute',
-                  width: '270px',
-                  height: '270px',
-                  borderRadius: '20px',
-                  backgroundColor: isDarkMode ? '#1e293b' : '#cbd5e1',
-                  transform: 'translateZ(-14px)',
-                  boxShadow: '0 0 25px rgba(0,0,0,0.5)'
-                }} />
-
-                <div style={{
-                  position: 'absolute',
-                  width: '270px',
-                  height: '270px',
-                  borderRadius: '20px',
-                  backgroundColor: isDarkMode ? '#334155' : '#94a3b8',
-                  transform: 'translateZ(-7px)'
-                }} />
-
                 <img
                   src={isDarkMode ? active3DModal.imageNight : active3DModal.imageDay}
                   alt={active3DModal.title}
@@ -721,20 +686,9 @@ export default function ProductSection() {
                     borderRadius: '20px',
                     transform: 'translateZ(12px)',
                     border: isDarkMode ? '2px solid rgba(255, 255, 255, 0.25)' : '2px solid rgba(0, 0, 0, 0.1)',
-                    filter: `drop-shadow(${-rotation.y * 0.4}px ${rotation.x * 0.4 + 15}px 25px rgba(0,0,0,0.5)) contrast(1.05) brightness(${1 + rotation.x * 0.003})`,
+                    filter: `drop-shadow(${-rotation.y * 0.4}px ${rotation.x * 0.4 + 15}px 25px rgba(0,0,0,0.5))`,
                   }}
                 />
-
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '270px',
-                  height: '270px',
-                  borderRadius: '20px',
-                  transform: 'translateZ(14px)',
-                  background: `linear-gradient(${135 + rotation.y}deg, rgba(255,255,255,0.3) 0%, transparent 40%, rgba(0,0,0,0.25) 100%)`,
-                  pointerEvents: 'none',
-                }} />
               </div>
 
               <div style={{
@@ -750,19 +704,11 @@ export default function ProductSection() {
                 backdropFilter: 'blur(10px)',
                 pointerEvents: 'none',
                 border: isDarkMode ? '1px solid rgba(6,182,212,0.4)' : '1px solid rgba(2,132,199,0.3)',
-                boxShadow: '0 0 20px rgba(6,182,212,0.2)'
               }}>
                 🖱️ หมุนวัตถุ 3D อิสระ 360°
               </div>
 
-              <div style={{
-                position: 'absolute',
-                bottom: '18px',
-                right: '18px',
-                display: 'flex',
-                gap: '8px',
-                zIndex: 10
-              }}>
+              <div style={{ position: 'absolute', bottom: '18px', right: '18px', display: 'flex', gap: '8px', zIndex: 10 }}>
                 <button
                   onClick={() => setZoom((z) => Math.min(z + 0.2, 1.8))}
                   style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}

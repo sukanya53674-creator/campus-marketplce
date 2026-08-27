@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShoppingBag, ArrowRight } from 'lucide-react';
 
 export default function SplashScreen() {
   const router = useRouter();
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,16 +16,37 @@ export default function SplashScreen() {
     return () => clearTimeout(timer);
   }, [router]);
 
-  return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col justify-between items-center p-6 relative overflow-hidden">
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-indigo-500/30 rounded-full blur-3xl pointer-events-none" />
+  // ฟังก์ชันคำนวณตำแหน่งเมาส์เทียบกับ Container
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
 
-      <div className="w-full flex justify-end pt-4">
-        <span className="text-xs px-3 py-1 rounded-full bg-slate-800 text-indigo-400 border border-indigo-500/20">
+  return (
+    <div
+      onMouseMove={handleMouseMove}
+      className="min-h-screen bg-slate-900 text-white flex flex-col justify-between items-center p-6 relative overflow-hidden group"
+    >
+      {/* Dynamic Mouse Spotlight: แสงวิ่งตามพิกัดเมาส์ */}
+      <div
+        className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-100"
+        style={{
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(99, 102, 241, 0.25), transparent 80%)`,
+        }}
+      />
+
+      {/* Static Glow Effect เดิม */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="w-full flex justify-end pt-4 z-10">
+        <span className="text-xs px-3 py-1 rounded-full bg-slate-800/80 text-indigo-400 border border-indigo-500/20 backdrop-blur-sm">
           Campus Market v1.0
         </span>
       </div>
-FF
+
       <div className="flex flex-col items-center text-center z-10 my-auto">
         <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center shadow-lg shadow-indigo-500/40 mb-6 animate-bounce">
           <ShoppingBag className="w-10 h-10 text-white" />

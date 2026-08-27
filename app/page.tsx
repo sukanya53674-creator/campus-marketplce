@@ -6,6 +6,8 @@ import { ShoppingBag, ArrowRight } from 'lucide-react';
 
 export default function SplashScreen() {
   const router = useRouter();
+  
+  // 1. สร้าง State เก็บตำแหน่งเมาส์ (x, y)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function SplashScreen() {
     return () => clearTimeout(timer);
   }, [router]);
 
-  // ฟังก์ชันคำนวณตำแหน่งเมาส์เทียบกับ Container
+  // 2. ฟังก์ชันคำนวณตำแหน่งเมาส์แบบ Real-time
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setMousePos({
@@ -30,7 +32,7 @@ export default function SplashScreen() {
       onMouseMove={handleMouseMove}
       className="min-h-screen bg-slate-900 text-white flex flex-col justify-between items-center p-6 relative overflow-hidden group"
     >
-      {/* Dynamic Mouse Spotlight: แสงวิ่งตามพิกัดเมาส์ */}
+      {/* 3. Layer แสงเรืองรองวิ่งตามเมาส์ (Mouse Spotlight) */}
       <div
         className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-100"
         style={{
@@ -38,7 +40,7 @@ export default function SplashScreen() {
         }}
       />
 
-      {/* Static Glow Effect เดิม */}
+      {/* Background Glow แบบคงที่เดิม */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full flex justify-end pt-4 z-10">

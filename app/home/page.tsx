@@ -150,19 +150,20 @@ export default function ProductSection() {
     setZoom(1);
   };
 
+  // ⚪ กลางวัน = ขาว (#ffffff) | ⬛ กลางคืน = ดำ (#000000)
   const theme = {
-    bg: isDarkMode ? '#070a12' : '#f8fafc',
-    cardBg: isDarkMode ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
-    textPrimary: isDarkMode ? '#ffffff' : '#0f172a',
-    textSecondary: isDarkMode ? '#94a3b8' : '#64748b',
-    border: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
-    borderHover: isDarkMode ? 'rgba(255, 255, 255, 0.35)' : 'rgba(99, 102, 241, 0.45)',
-    dockBg: isDarkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-    shadow: isDarkMode ? '0 15px 30px rgba(0,0,0,0.6)' : '0 10px 25px rgba(0,0,0,0.05)',
+    bg: isDarkMode ? '#000000' : '#ffffff',
+    cardBg: isDarkMode ? '#0d0d0d' : '#f8f9fa',
+    textPrimary: isDarkMode ? '#ffffff' : '#000000',
+    textSecondary: isDarkMode ? '#a1a1aa' : '#52525b',
+    border: isDarkMode ? '#27272a' : '#e4e4e7',
+    borderHover: isDarkMode ? '#71717a' : '#6366f1',
+    dockBg: isDarkMode ? '#121212' : '#f4f4f5',
+    shadow: isDarkMode ? '0 10px 30px rgba(0,0,0,1)' : '0 8px 20px rgba(0,0,0,0.06)',
   };
 
   return (
-    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '24px', color: theme.textPrimary, fontFamily: 'sans-serif', transition: 'background-color 0.3s', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '24px', color: theme.textPrimary, fontFamily: 'sans-serif', transition: 'background-color 0.3s ease', position: 'relative', overflow: 'hidden' }}>
       
       {/* Dynamic Cursor Light Spotlight */}
       <div
@@ -171,13 +172,13 @@ export default function ProductSection() {
           position: 'fixed',
           inset: 0,
           zIndex: 1,
-          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(99, 102, 241, 0.12)' : 'rgba(99, 102, 241, 0.06)'}, transparent 80%)`,
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(99, 102, 241, 0.18)' : 'rgba(99, 102, 241, 0.08)'}, transparent 80%)`,
         }}
       />
 
       <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative', zIndex: 2 }}>
         
-        {/* Navigation & Theme Toggle (Icon Only) */}
+        {/* Navigation & Toggle */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{
             display: 'flex',
@@ -188,7 +189,6 @@ export default function ProductSection() {
             backgroundColor: theme.dockBg,
             border: `1px solid ${theme.border}`,
             borderRadius: '16px',
-            backdropFilter: 'blur(16px)',
             boxShadow: theme.shadow
           }}>
             <button
@@ -255,10 +255,10 @@ export default function ProductSection() {
             </button>
           </div>
 
-          {/* ICON-ONLY Theme Toggle Button */}
+          {/* ปุ่มไอคอนสลับโหมด */}
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
-            title={isDarkMode ? 'สลับเป็นโหมดกลางวัน' : 'สลับเป็นโหมดกลางคืน'}
+            title={isDarkMode ? 'สลับเป็นโหมดกลางวัน (สีขาว)' : 'สลับเป็นโหมดกลางคืน (สีดำ)'}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -277,7 +277,7 @@ export default function ProductSection() {
             {isDarkMode ? (
               <Sun style={{ width: '20px', height: '20px', color: '#fbbf24', filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.6))' }} />
             ) : (
-              <Moon style={{ width: '20px', height: '20px', color: '#6366f1', filter: 'drop-shadow(0 0 6px rgba(99, 102, 241, 0.6))' }} />
+              <Moon style={{ width: '20px', height: '20px', color: '#4f46e5', filter: 'drop-shadow(0 0 6px rgba(79, 70, 229, 0.6))' }} />
             )}
           </button>
         </div>
@@ -285,10 +285,10 @@ export default function ProductSection() {
         {/* Section Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
           <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', fontWeight: 700, margin: 0 }}>
-            <Sparkles style={{ width: '18px', height: '18px', color: '#818cf8' }} />
+            <Sparkles style={{ width: '18px', height: '18px', color: '#6366f1' }} />
             รายการสินค้าไฮไลท์
           </h3>
-          <span style={{ fontSize: '12px', color: isDarkMode ? '#a5b4fc' : '#4f46e5', backgroundColor: isDarkMode ? 'rgba(30, 27, 75, 0.6)' : 'rgba(238, 242, 255, 1)', border: `1px solid ${theme.border}`, padding: '4px 12px', borderRadius: '20px' }}>
+          <span style={{ fontSize: '12px', color: isDarkMode ? '#a5b4fc' : '#4f46e5', backgroundColor: isDarkMode ? '#18181b' : '#f4f4f5', border: `1px solid ${theme.border}`, padding: '4px 12px', borderRadius: '20px' }}>
             {filteredProducts.length} รายการ
           </span>
         </div>
@@ -314,7 +314,6 @@ export default function ProductSection() {
                   border: isHovered ? `1px solid ${theme.borderHover}` : `1px solid ${theme.border}`,
                   padding: '16px',
                   transition: isHovered ? 'transform 0.05s linear' : 'all 0.3s ease-out',
-                  backdropFilter: 'blur(20px)',
                   boxShadow: isHovered ? `0 20px 40px -10px ${item.glowColor}` : theme.shadow,
                   cursor: 'pointer',
                   overflow: 'hidden'
@@ -339,7 +338,7 @@ export default function ProductSection() {
                   height: '190px',
                   borderRadius: '16px',
                   overflow: 'hidden',
-                  backgroundColor: isDarkMode ? '#020617' : '#e2e8f0',
+                  backgroundColor: isDarkMode ? '#18181b' : '#e4e4e7',
                   marginBottom: '14px',
                 }}>
                   <img
@@ -364,7 +363,7 @@ export default function ProductSection() {
                       gap: '4px',
                       padding: '4px 10px',
                       borderRadius: '20px',
-                      backgroundColor: 'rgba(2, 6, 23, 0.85)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
                       border: '1px solid rgba(6, 182, 212, 0.5)',
                       color: '#67e8f9',
                       fontSize: '10px',
@@ -384,7 +383,7 @@ export default function ProductSection() {
                       gap: '4px',
                       padding: '4px 10px',
                       borderRadius: '20px',
-                      backgroundColor: 'rgba(69, 10, 10, 0.85)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
                       border: '1px solid rgba(244, 63, 94, 0.5)',
                       color: '#fda4af',
                       fontSize: '10px',
@@ -397,7 +396,7 @@ export default function ProductSection() {
                   <div style={{
                     position: 'absolute',
                     inset: 0,
-                    backgroundColor: 'rgba(2, 6, 23, 0.75)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
                     backdropFilter: 'blur(4px)',
                     display: 'flex',
                     alignItems: 'center',
@@ -436,7 +435,7 @@ export default function ProductSection() {
                       fontSize: '10px',
                       color: isDarkMode ? '#a5b4fc' : '#4f46e5',
                       fontWeight: 600,
-                      backgroundColor: isDarkMode ? 'rgba(30, 27, 75, 0.6)' : 'rgba(238, 242, 255, 1)',
+                      backgroundColor: isDarkMode ? '#18181b' : '#eeef4',
                       padding: '2px 8px',
                       borderRadius: '6px',
                     }}>
@@ -457,7 +456,7 @@ export default function ProductSection() {
                       </span>
                     </div>
 
-                    <span style={{ fontSize: '10px', color: '#10b981', backgroundColor: isDarkMode ? 'rgba(6, 78, 59, 0.5)' : '#d1fae5', padding: '4px 8px', borderRadius: '8px', fontWeight: 600 }}>
+                    <span style={{ fontSize: '10px', color: '#10b981', backgroundColor: isDarkMode ? '#064e3b' : '#d1fae5', padding: '4px 8px', borderRadius: '8px', fontWeight: 600 }}>
                       {item.condition}
                     </span>
                   </div>
@@ -485,14 +484,14 @@ export default function ProductSection() {
             position: 'relative',
             width: '100%',
             maxWidth: '700px',
-            backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+            backgroundColor: isDarkMode ? '#0d0d0d' : '#ffffff',
             borderRadius: '28px',
             border: `1px solid ${theme.border}`,
             padding: '24px',
             display: 'flex',
             flexDirection: 'column',
             gap: '16px',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.7)'
+            boxShadow: '0 25px 60px rgba(0,0,0,0.8)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -504,7 +503,7 @@ export default function ProductSection() {
               <button
                 onClick={() => setActive3DModal(null)}
                 style={{
-                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  backgroundColor: isDarkMode ? '#27272a' : '#f4f4f5',
                   border: 'none',
                   color: theme.textPrimary,
                   borderRadius: '50%',
@@ -531,7 +530,7 @@ export default function ProductSection() {
                 height: '380px',
                 borderRadius: '20px',
                 overflow: 'hidden',
-                backgroundColor: isDarkMode ? '#020617' : '#f1f5f9',
+                backgroundColor: isDarkMode ? '#121212' : '#f4f4f5',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -575,7 +574,7 @@ export default function ProductSection() {
                   width: '260px',
                   height: '260px',
                   borderRadius: '16px',
-                  backgroundColor: isDarkMode ? '#090d16' : '#cbd5e1',
+                  backgroundColor: isDarkMode ? '#18181b' : '#cbd5e1',
                   transform: 'translateZ(-12px)',
                   boxShadow: '0 0 20px rgba(0,0,0,0.8)'
                 }} />
@@ -585,7 +584,7 @@ export default function ProductSection() {
                   width: '260px',
                   height: '260px',
                   borderRadius: '16px',
-                  backgroundColor: isDarkMode ? '#1e1b4b' : '#94a3b8',
+                  backgroundColor: isDarkMode ? '#27272a' : '#94a3b8',
                   transform: 'translateZ(-6px)'
                 }} />
 
@@ -620,7 +619,7 @@ export default function ProductSection() {
                 position: 'absolute',
                 bottom: '16px',
                 left: '16px',
-                backgroundColor: 'rgba(2, 6, 23, 0.85)',
+                backgroundColor: 'rgba(0, 0, 0, 0.85)',
                 color: '#67e8f9',
                 fontSize: '11px',
                 fontWeight: 600,
@@ -644,19 +643,19 @@ export default function ProductSection() {
               }}>
                 <button
                   onClick={() => setZoom((z) => Math.min(z + 0.2, 1.8))}
-                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(2,6,23,0.85)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
+                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
                 >
                   <ZoomIn style={{ width: '16px', height: '16px' }} />
                 </button>
                 <button
                   onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
-                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(2,6,23,0.85)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
+                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
                 >
                   <ZoomOut style={{ width: '16px', height: '16px' }} />
                 </button>
                 <button
                   onClick={() => { setRotation({ x: 15, y: -25 }); setZoom(1); }}
-                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(2,6,23,0.85)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
+                  style={{ padding: '8px', borderRadius: '10px', backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer' }}
                 >
                   <RefreshCw style={{ width: '16px', height: '16px' }} />
                 </button>
@@ -666,7 +665,7 @@ export default function ProductSection() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px' }}>
               <div>
                 <p style={{ fontSize: '11px', color: theme.textSecondary, margin: 0 }}>ราคาสินค้า</p>
-                <span style={{ fontSize: '22px', fontWeight: 900, color: '#c084fc' }}>{active3DModal.price}</span>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: isDarkMode ? '#c084fc' : '#7c3aed' }}>{active3DModal.price}</span>
               </div>
               <button style={{
                 padding: '12px 28px',

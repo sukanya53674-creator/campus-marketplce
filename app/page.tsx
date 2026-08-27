@@ -24,7 +24,7 @@ export default function SplashScreen() {
           Campus Market v1.0
         </span>
       </div>
-
+FF
       <div className="flex flex-col items-center text-center z-10 my-auto">
         <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center shadow-lg shadow-indigo-500/40 mb-6 animate-bounce">
           <ShoppingBag className="w-10 h-10 text-white" />

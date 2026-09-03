@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, 
-  X, Rotate3d, ZoomIn, ZoomOut, RefreshCw, Search, Heart, ShoppingBag
+  X, Rotate3d, ZoomIn, ZoomOut, RefreshCw, Search, Heart, ShoppingBag, ShieldCheck
 } from 'lucide-react';
 
 interface Product {
@@ -106,7 +106,7 @@ export default function ProductPage() {
   const [trailPos, setTrailPos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
 
   const [active3DModal, setActive3DModal] = useState<Product | null>(null);
-  const [rotation, setRotation] = useState<{ x: number; y: number }>({ x: 20, y: -30 });
+  const [rotation, setRotation] = useState<{ x: number; y: number }>({ x: 15, y: -25 });
   const [zoom, setZoom] = useState<number>(1);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -193,72 +193,53 @@ export default function ProductPage() {
 
   const open3DModal = (product: Product) => {
     setActive3DModal(product);
-    setRotation({ x: 20, y: -30 });
+    setRotation({ x: 15, y: -25 });
     setZoom(1);
   };
 
   const theme = {
-    bg: isDarkMode ? '#05070f' : '#f8fafc',
-    cardBg: isDarkMode ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+    bg: isDarkMode ? '#030712' : '#f8fafc',
+    cardBg: isDarkMode ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
     textPrimary: isDarkMode ? '#ffffff' : '#0f172a',
     textSecondary: isDarkMode ? '#94a3b8' : '#64748b',
-    border: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
-    borderHover: isDarkMode ? '#818cf8' : '#6366f1',
+    border: isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
+    borderHover: isDarkMode ? '#38bdf8' : '#6366f1',
     dockBg: isDarkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
     shadow: isDarkMode ? '0 20px 50px rgba(0,0,0,0.8)' : '0 10px 30px rgba(0,0,0,0.05)',
-    modalOverlay: isDarkMode ? 'rgba(3, 7, 18, 0.88)' : 'rgba(255, 255, 255, 0.88)',
-    gridColor: isDarkMode ? 'rgba(99,102,241,0.2)' : 'rgba(99,102,241,0.1)',
+    modalOverlay: isDarkMode ? 'rgba(2, 6, 23, 0.92)' : 'rgba(255, 255, 255, 0.92)',
   };
 
   return (
-    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '32px 24px', color: theme.textPrimary, fontFamily: "'Inter', sans-serif", transition: 'background-color 0.4s ease', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '32px 24px', color: theme.textPrimary, fontFamily: "'Inter', sans-serif", position: 'relative', overflow: 'hidden' }}>
       
-      <div
-        style={{
-          pointerEvents: 'none',
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1,
-          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(99, 102, 241, 0.18)' : 'rgba(99, 102, 241, 0.08)'}, transparent 80%)`,
-        }}
-      />
+      {/* Background Glow */}
+      <div style={{
+        pointerEvents: 'none',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1,
+        background: `radial-gradient(700px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(56, 189, 248, 0.12)' : 'rgba(99, 102, 241, 0.08)'}, transparent 80%)`,
+      }} />
 
-      <div
-        style={{
-          pointerEvents: 'none',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          border: '2px solid rgba(168, 85, 247, 0.6)',
-          backgroundColor: 'rgba(99, 102, 241, 0.15)',
-          boxShadow: '0 0 15px rgba(168, 85, 247, 0.5)',
-          transform: `translate(${trailPos.x - 18}px, ${trailPos.y - 18}px)`,
-          zIndex: 9999,
-          backdropFilter: 'blur(2px)',
-          transition: 'width 0.2s, height 0.2s',
-        }}
-      />
-
-      <div
-        style={{
-          pointerEvents: 'none',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '8px',
-          height: '8px',
-          borderRadius: '50%',
-          backgroundColor: '#38bdf8',
-          boxShadow: '0 0 10px #38bdf8, 0 0 20px #818cf8',
-          transform: `translate(${mousePos.x - 4}px, ${mousePos.y - 4}px)`,
-          zIndex: 10000,
-        }}
-      />
+      {/* Cursor Follower */}
+      <div style={{
+        pointerEvents: 'none',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '32px',
+        height: '32px',
+        borderRadius: '50%',
+        border: '1.5px solid rgba(56, 189, 248, 0.6)',
+        transform: `translate(${trailPos.x - 16}px, ${trailPos.y - 16}px)`,
+        zIndex: 9999,
+        backdropFilter: 'blur(1px)',
+        transition: 'width 0.2s, height 0.2s',
+      }} />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px', position: 'relative', zIndex: 2 }}>
+        
+        {/* Navigation & Controls */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{
             display: 'flex',
@@ -283,7 +264,7 @@ export default function ProductPage() {
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: selectedCategory === 'all' ? 'linear-gradient(135deg, #4f46e5, #9333ea)' : 'transparent',
+                background: selectedCategory === 'all' ? 'linear-gradient(135deg, #06b6d4, #3b82f6)' : 'transparent',
                 color: selectedCategory === 'all' ? '#ffffff' : theme.textSecondary,
               }}
             >
@@ -303,12 +284,12 @@ export default function ProductPage() {
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: selectedCategory === '3d' ? 'linear-gradient(135deg, #06b6d4, #2563eb)' : 'transparent',
+                background: selectedCategory === '3d' ? 'linear-gradient(135deg, #8b5cf6, #ec4899)' : 'transparent',
                 color: selectedCategory === '3d' ? '#ffffff' : theme.textSecondary,
               }}
             >
               <Box style={{ width: '16px', height: '16px' }} />
-              โมเดล 3D
+              โหมด 3D
             </button>
 
             <button
@@ -323,12 +304,12 @@ export default function ProductPage() {
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
-                background: selectedCategory === 'hot' ? 'linear-gradient(135deg, #f59e0b, #e11d48)' : 'transparent',
+                background: selectedCategory === 'hot' ? 'linear-gradient(135deg, #f59e0b, #ef4444)' : 'transparent',
                 color: selectedCategory === 'hot' ? '#ffffff' : theme.textSecondary,
               }}
             >
               <Flame style={{ width: '16px', height: '16px' }} />
-              สินค้ามาแรง
+              มาแรง
             </button>
           </div>
 
@@ -384,21 +365,23 @@ export default function ProductPage() {
                 cursor: 'pointer',
               }}
             >
-              {isDarkMode ? <Sun style={{ width: '20px', height: '20px', color: '#fbbf24' }} /> : <Moon style={{ width: '20px', height: '20px', color: '#4f46e5' }} />}
+              {isDarkMode ? <Sun style={{ width: '20px', height: '20px', color: '#38bdf8' }} /> : <Moon style={{ width: '20px', height: '20px', color: '#4f46e5' }} />}
             </button>
           </div>
         </div>
 
+        {/* Section Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', fontWeight: 800, margin: 0 }}>
-            <Sparkles style={{ width: '20px', height: '20px', color: '#6366f1' }} />
-            รายการสินค้าไฮไลท์
+            <Sparkles style={{ width: '20px', height: '20px', color: '#38bdf8' }} />
+            รายการสินค้า
           </h3>
-          <span style={{ fontSize: '12px', color: isDarkMode ? '#a5b4fc' : '#4f46e5', backgroundColor: theme.dockBg, border: `1px solid ${theme.border}`, padding: '4px 14px', borderRadius: '20px', fontWeight: 600 }}>
-            พบ {filteredProducts.length} รายการ
+          <span style={{ fontSize: '12px', color: isDarkMode ? '#38bdf8' : '#2563eb', backgroundColor: theme.dockBg, border: `1px solid ${theme.border}`, padding: '4px 14px', borderRadius: '20px', fontWeight: 600 }}>
+            {filteredProducts.length} สินค้า
           </span>
         </div>
 
+        {/* Product Cards Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '24px', perspective: '1200px' }}>
           {filteredProducts.map((item) => {
             const state = cardState[item.id] || { x: 0, y: 0, mouseX: 0, mouseY: 0 };
@@ -456,7 +439,7 @@ export default function ProductPage() {
                   height: '200px',
                   borderRadius: '20px',
                   overflow: 'hidden',
-                  backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0',
+                  backgroundColor: isDarkMode ? '#0f172a' : '#e2e8f0',
                   marginBottom: '16px',
                 }}>
                   <img
@@ -466,7 +449,7 @@ export default function ProductPage() {
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
-                      transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+                      transform: isHovered ? 'scale(1.08)' : 'scale(1)',
                       transition: 'transform 0.5s ease-out'
                     }}
                   />
@@ -474,7 +457,7 @@ export default function ProductPage() {
                   <div style={{
                     position: 'absolute',
                     inset: 0,
-                    backgroundColor: 'rgba(15, 23, 42, 0.75)',
+                    backgroundColor: 'rgba(3, 7, 18, 0.75)',
                     backdropFilter: 'blur(6px)',
                     display: 'flex',
                     alignItems: 'center',
@@ -489,17 +472,17 @@ export default function ProductPage() {
                         alignItems: 'center',
                         gap: '8px',
                         padding: '12px 22px',
-                        background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                        background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
                         color: '#ffffff',
                         border: 'none',
                         borderRadius: '14px',
                         fontSize: '13px',
                         fontWeight: 700,
                         cursor: 'pointer',
-                        boxShadow: '0 8px 25px rgba(99,102,241,0.6)',
+                        boxShadow: '0 8px 25px rgba(6, 182, 212, 0.5)',
                       }}
                     >
-                      <Eye style={{ width: '18px', height: '18px' }} /> กดดูภาพ 3D
+                      <Eye style={{ width: '18px', height: '18px' }} /> เปิด 3D Interactive
                     </button>
                   </div>
                 </div>
@@ -508,9 +491,9 @@ export default function ProductPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{
                       fontSize: '11px',
-                      color: isDarkMode ? '#a5b4fc' : '#4f46e5',
+                      color: isDarkMode ? '#38bdf8' : '#0284c7',
                       fontWeight: 600,
-                      backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)',
+                      backgroundColor: isDarkMode ? 'rgba(56, 189, 248, 0.12)' : 'rgba(2, 132, 199, 0.08)',
                       padding: '4px 10px',
                       borderRadius: '8px',
                     }}>
@@ -526,8 +509,8 @@ export default function ProductPage() {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div>
-                      <p style={{ fontSize: '11px', color: theme.textSecondary, margin: 0 }}>ราคาเริ่มต้น</p>
-                      <span style={{ fontSize: '20px', fontWeight: 900, color: isDarkMode ? '#c084fc' : '#7c3aed' }}>
+                      <p style={{ fontSize: '11px', color: theme.textSecondary, margin: 0 }}>ราคา</p>
+                      <span style={{ fontSize: '20px', fontWeight: 900, color: isDarkMode ? '#38bdf8' : '#2563eb' }}>
                         {item.price}
                       </span>
                     </div>
@@ -542,14 +525,14 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* 3D INTERACTIVE MODAL (ENHANCED 3D DEPTH) */}
+      {/* ULTRA-MODERN CYBERPUNK 3D VIEWERS MODAL */}
       {active3DModal && (
         <div style={{
           position: 'fixed',
           inset: 0,
           zIndex: 50,
           backgroundColor: theme.modalOverlay,
-          backdropFilter: 'blur(20px)',
+          backdropFilter: 'blur(24px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -558,32 +541,46 @@ export default function ProductPage() {
           <div style={{
             position: 'relative',
             width: '100%',
-            maxWidth: '760px',
-            backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-            borderRadius: '32px',
-            border: `1px solid ${theme.border}`,
+            maxWidth: '820px',
+            backgroundColor: isDarkMode ? '#0a0f1d' : '#ffffff',
+            borderRadius: '36px',
+            border: isDarkMode ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(0, 0, 0, 0.1)',
             padding: '28px',
             display: 'flex',
             flexDirection: 'column',
             gap: '20px',
-            boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.5)'
+            boxShadow: isDarkMode ? '0 0 80px rgba(6, 182, 212, 0.25)' : '0 30px 60px rgba(0,0,0,0.15)'
           }}>
+            {/* Modal Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Rotate3d style={{ width: '24px', height: '24px', color: '#06b6d4' }} />
-                <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: theme.textPrimary }}>
-                  3D Perspective Viewer: {active3DModal.title}
-                </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  padding: '8px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Rotate3d style={{ width: '20px', height: '20px' }} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: theme.textPrimary }}>
+                    {active3DModal.title}
+                  </h3>
+                  <span style={{ fontSize: '11px', color: '#06b6d4', fontWeight: 600 }}>Holographic 3D Interactive Model</span>
+                </div>
               </div>
               <button
                 onClick={() => setActive3DModal(null)}
                 style={{
-                  backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : '#f1f5f9',
+                  backgroundColor: isDarkMode ? 'rgba(255,255,255,0.06)' : '#f1f5f9',
                   border: 'none',
                   color: theme.textPrimary,
                   borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
+                  width: '38px',
+                  height: '38px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -594,6 +591,7 @@ export default function ProductPage() {
               </button>
             </div>
 
+            {/* 3D Canvas Area */}
             <div
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
@@ -602,99 +600,136 @@ export default function ProductPage() {
               style={{
                 position: 'relative',
                 width: '100%',
-                height: '440px',
-                borderRadius: '24px',
+                height: '460px',
+                borderRadius: '28px',
                 overflow: 'hidden',
-                backgroundColor: isDarkMode ? '#020617' : '#f8fafc',
+                backgroundColor: isDarkMode ? '#020617' : '#f1f5f9',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                perspective: '800px',
+                perspective: '1000px',
                 cursor: isDragging ? 'grabbing' : 'grab',
-                userSelect: 'none'
+                userSelect: 'none',
+                border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.05)' : 'none'
               }}
             >
+              {/* Grid Background Lines */}
               <div style={{
                 position: 'absolute',
-                width: '100%',
-                height: '100%',
-                backgroundImage: `radial-gradient(circle, ${theme.gridColor} 1.5px, transparent 1.5px)`,
-                backgroundSize: '30px 30px',
+                inset: 0,
+                backgroundImage: isDarkMode 
+                  ? 'linear-gradient(to right, rgba(56, 189, 248, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(56, 189, 248, 0.08) 1px, transparent 1px)'
+                  : 'linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px)',
+                backgroundSize: '40px 40px',
                 pointerEvents: 'none'
               }} />
 
-              {/* 3D Box Container */}
+              {/* Top Cyber Light Flare */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                width: '60%',
+                height: '2px',
+                background: 'linear-gradient(90deg, transparent, #06b6d4, #3b82f6, transparent)',
+                boxShadow: '0 0 15px #06b6d4'
+              }} />
+
+              {/* Main 3D Model Stage Wrapper */}
               <div style={{
                 transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${zoom})`,
                 transformStyle: 'preserve-3d',
-                transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.2, 0, 0.2, 1)',
+                transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.1, 0, 0.1, 1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
-                width: '280px',
-                height: '220px'
+                width: '300px',
+                height: '240px'
               }}>
-                
-                {/* 1. Floor Base Pedestal (ฐานวงกลมรองรับสินค้า) */}
+
+                {/* Cyber Hologram Outer Ring 1 */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '-60px',
-                  width: '320px',
-                  height: '320px',
+                  bottom: '-80px',
+                  width: '360px',
+                  height: '360px',
                   borderRadius: '50%',
-                  background: isDarkMode 
-                    ? 'radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(15, 23, 42, 0) 70%)'
-                    : 'radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(255, 255, 255, 0) 70%)',
+                  border: '2px dashed rgba(6, 182, 212, 0.6)',
                   transform: 'rotateX(90deg) translateZ(-80px)',
-                  border: isDarkMode ? '2px solid rgba(99, 102, 241, 0.4)' : '2px solid rgba(99, 102, 241, 0.2)',
-                  boxShadow: '0 0 30px rgba(99, 102, 241, 0.3)',
+                  boxShadow: '0 0 25px rgba(6, 182, 212, 0.4)',
                   pointerEvents: 'none'
                 }} />
 
-                {/* 2. Soft Dynamic Shadow (เงาตามการหมุน) */}
+                {/* Cyber Hologram Inner Solid Ring 2 */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '-40px',
-                  width: '260px',
-                  height: '60px',
+                  bottom: '-80px',
+                  width: '280px',
+                  height: '280px',
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                  filter: 'blur(16px)',
-                  transform: `rotateX(80deg) translateZ(-60px) translateX(${-rotation.y * 0.9}px)`,
-                  opacity: Math.max(0.2, 1 - Math.abs(rotation.x) / 90),
+                  border: '3px solid rgba(59, 130, 246, 0.8)',
+                  background: 'radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, transparent 70%)',
+                  transform: 'rotateX(90deg) translateZ(-80px)',
+                  boxShadow: 'inset 0 0 20px rgba(6, 182, 212, 0.6)',
                   pointerEvents: 'none'
                 }} />
 
-                {/* 3. 3D Thick Back Layer (แผ่นหลังเพื่อสร้างความหนา) */}
+                {/* Laser Ray Column Effects */}
                 <div style={{
                   position: 'absolute',
-                  inset: 0,
-                  borderRadius: '20px',
-                  backgroundColor: isDarkMode ? '#1e1b4b' : '#cbd5e1',
-                  transform: 'translateZ(-15px)',
-                  boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.8)'
+                  bottom: '-80px',
+                  width: '260px',
+                  height: '220px',
+                  background: 'linear-gradient(to top, rgba(6, 182, 212, 0.25), transparent)',
+                  transform: 'rotateX(0deg) translateZ(-50px)',
+                  pointerEvents: 'none',
+                  clipPath: 'polygon(15% 100%, 85% 100%, 100% 0, 0 0)'
                 }} />
 
-                {/* 4. 3D Side Frame / Extrusion (ขอบข้างสร้างมิติ) */}
+                {/* Dynamic Shadow Layer */}
                 <div style={{
                   position: 'absolute',
-                  inset: 0,
-                  borderRadius: '20px',
-                  border: '14px solid rgba(99, 102, 241, 0.3)',
-                  transform: 'translateZ(-5px)',
-                  filter: 'blur(2px)',
+                  bottom: '-50px',
+                  width: '260px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                  filter: 'blur(18px)',
+                  transform: `rotateX(90deg) translateZ(-70px) translateX(${-rotation.y * 0.8}px)`,
+                  pointerEvents: 'none'
                 }} />
 
-                {/* 5. Main Image Layer (รูปภาพสินค้าหลัก) */}
+                {/* Layer 1: Backing Frame Plate */}
                 <div style={{
                   position: 'absolute',
                   inset: 0,
-                  borderRadius: '20px',
+                  borderRadius: '24px',
+                  backgroundColor: isDarkMode ? '#030712' : '#cbd5e1',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  transform: 'translateZ(-20px)',
+                  boxShadow: '0 0 30px rgba(0, 0, 0, 0.9)'
+                }} />
+
+                {/* Layer 2: Glassmorphic Middle Frame */}
+                <div style={{
+                  position: 'absolute',
+                  inset: '-6px',
+                  borderRadius: '26px',
+                  border: '2px solid rgba(56, 189, 248, 0.5)',
+                  background: 'rgba(15, 23, 42, 0.3)',
+                  backdropFilter: 'blur(4px)',
+                  transform: 'translateZ(-8px)'
+                }} />
+
+                {/* Layer 3: Main High-Tech Canvas Image */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '22px',
                   overflow: 'hidden',
-                  transform: 'translateZ(10px)',
-                  border: isDarkMode ? '2px solid rgba(255, 255, 255, 0.4)' : '2px solid rgba(255, 255, 255, 0.9)',
-                  boxShadow: `${-rotation.y * 0.7}px ${rotation.x * 0.7 + 15}px 30px rgba(0, 0, 0, 0.7), 0 0 25px ${active3DModal.glowColor}`,
+                  transform: 'translateZ(15px)',
+                  border: '2px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: `${-rotation.y * 0.8}px ${rotation.x * 0.8 + 20}px 35px rgba(0, 0, 0, 0.8), 0 0 30px ${active3DModal.glowColor}`,
                 }}>
                   <img
                     src={isDarkMode ? active3DModal.imageNight : active3DModal.imageDay}
@@ -706,112 +741,145 @@ export default function ProductPage() {
                       objectFit: 'cover'
                     }}
                   />
-                  {/* Glossy Reflection Highlight (แสงสะท้อนผิวมันวาว) */}
+
+                  {/* High Gloss Ray Sweep Effect */}
                   <div style={{
                     position: 'absolute',
                     inset: 0,
-                    background: `linear-gradient(${135 + rotation.y}deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 50%)`,
+                    background: `linear-gradient(${120 + rotation.y * 1.5}deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.1) 100%)`,
                     pointerEvents: 'none'
                   }} />
                 </div>
 
-                {/* 6. Floating Glass Tag (ป้ายหมอยื่นลอยออกมาข้างหน้า) */}
+                {/* Floating Tech Badge (Top Left - Depth 50px) */}
                 <div style={{
                   position: 'absolute',
-                  top: '-15px',
-                  right: '-15px',
-                  backgroundColor: 'rgba(99, 102, 241, 0.9)',
+                  top: '-18px',
+                  left: '-18px',
+                  backgroundColor: 'rgba(3, 7, 18, 0.85)',
+                  border: '1px solid #06b6d4',
+                  color: '#38bdf8',
+                  padding: '6px 14px',
+                  borderRadius: '12px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  transform: 'translateZ(50px)',
+                  boxShadow: '0 10px 25px rgba(6, 182, 212, 0.4)',
+                  backdropFilter: 'blur(10px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <ShieldCheck style={{ width: '14px', height: '14px', color: '#10b981' }} />
+                  {active3DModal.condition}
+                </div>
+
+                {/* Floating Category Badge (Top Right - Depth 60px) */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-18px',
+                  right: '-18px',
+                  background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
                   color: '#ffffff',
                   padding: '6px 14px',
                   borderRadius: '12px',
                   fontSize: '11px',
                   fontWeight: 800,
-                  transform: 'translateZ(45px)',
-                  boxShadow: '0 10px 20px rgba(0, 0, 0, 0.4)',
-                  border: '1px solid rgba(255, 255, 255, 0.4)',
-                  backdropFilter: 'blur(8px)'
+                  transform: 'translateZ(60px)',
+                  boxShadow: '0 10px 25px rgba(59, 130, 246, 0.5)',
                 }}>
-                  ✨ {active3DModal.category}
+                  {active3DModal.category}
                 </div>
 
-                {/* 7. Floating Price Tag (ป้ายราคาลอยระดับหน้าสุด) */}
+                {/* Floating Glass Price Tag (Bottom Right - Depth 75px) */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '-15px',
-                  left: '-15px',
+                  bottom: '-20px',
+                  right: '-15px',
                   backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                  color: '#38bdf8',
-                  padding: '8px 16px',
-                  borderRadius: '14px',
-                  fontSize: '13px',
+                  border: '1.5px solid #38bdf8',
+                  color: '#ffffff',
+                  padding: '10px 20px',
+                  borderRadius: '16px',
+                  fontSize: '16px',
                   fontWeight: 900,
-                  transform: 'translateZ(55px)',
-                  boxShadow: '0 12px 25px rgba(0, 0, 0, 0.5)',
-                  border: '1px solid rgba(56, 189, 248, 0.5)',
-                  backdropFilter: 'blur(8px)'
+                  transform: 'translateZ(75px)',
+                  boxShadow: '0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.4)',
+                  backdropFilter: 'blur(12px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}>
-                  {active3DModal.price}
+                  <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 600 }}>PRICE</span>
+                  <span style={{ color: '#38bdf8' }}>{active3DModal.price}</span>
                 </div>
 
               </div>
 
+              {/* Floating Instruction Banner */}
               <div style={{
                 position: 'absolute',
                 bottom: '18px',
                 left: '18px',
-                backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                color: isDarkMode ? '#67e8f9' : '#0284c7',
+                backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.9)',
+                color: isDarkMode ? '#38bdf8' : '#0284c7',
                 fontSize: '12px',
                 fontWeight: 700,
                 padding: '8px 16px',
                 borderRadius: '20px',
-                backdropFilter: 'blur(10px)',
+                backdropFilter: 'blur(12px)',
                 pointerEvents: 'none',
-                border: isDarkMode ? '1px solid rgba(6,182,212,0.4)' : '1px solid rgba(2,132,199,0.3)',
+                border: isDarkMode ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(2, 132, 199, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
               }}>
-                🖱️ คลิกค้างเพื่อหมุนวัตถุแบบ Multi-layer Depth 3D
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 8px #10b981' }} />
+                คลิกค้างเพื่อหมุนมุมมอง 3D อิสระ 360°
               </div>
 
+              {/* Floating Controls */}
               <div style={{ position: 'absolute', bottom: '18px', right: '18px', display: 'flex', gap: '8px', zIndex: 10 }}>
                 <button
                   onClick={() => setZoom((z) => Math.min(z + 0.2, 1.8))}
-                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer', backdropFilter: 'blur(8px)' }}
                 >
                   <ZoomIn style={{ width: '18px', height: '18px' }} />
                 </button>
                 <button
                   onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
-                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer', backdropFilter: 'blur(8px)' }}
                 >
                   <ZoomOut style={{ width: '18px', height: '18px' }} />
                 </button>
                 <button
-                  onClick={() => { setRotation({ x: 20, y: -30 }); setZoom(1); }}
-                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
+                  onClick={() => { setRotation({ x: 15, y: -25 }); setZoom(1); }}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer', backdropFilter: 'blur(8px)' }}
                 >
                   <RefreshCw style={{ width: '18px', height: '18px' }} />
                 </button>
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px' }}>
+            {/* Modal Bottom Action Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px' }}>
               <div>
-                <p style={{ fontSize: '12px', color: theme.textSecondary, margin: 0 }}>ราคาสินค้า</p>
-                <span style={{ fontSize: '24px', fontWeight: 900, color: isDarkMode ? '#c084fc' : '#7c3aed' }}>{active3DModal.price}</span>
+                <p style={{ fontSize: '12px', color: theme.textSecondary, margin: 0 }}>ยอดรวมสุทธิ</p>
+                <span style={{ fontSize: '26px', fontWeight: 900, color: isDarkMode ? '#38bdf8' : '#2563eb' }}>{active3DModal.price}</span>
               </div>
               <button style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '14px 32px',
-                background: 'linear-gradient(135deg, #4f46e5, #9333ea)',
+                padding: '14px 36px',
+                background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
                 color: '#ffffff',
                 border: 'none',
-                borderRadius: '16px',
+                borderRadius: '18px',
                 fontWeight: 800,
                 fontSize: '15px',
                 cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(99,102,241,0.5)'
+                boxShadow: '0 10px 30px rgba(6, 182, 212, 0.4)'
               }}>
                 <ShoppingBag style={{ width: '18px', height: '18px' }} />
                 ติดต่อสั่งซื้อทันที

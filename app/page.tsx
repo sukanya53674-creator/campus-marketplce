@@ -72,7 +72,7 @@ const PRODUCTS: Product[] = [
     id: 4,
     title: 'พัดลมพกพาชาร์จ USB สายมินิมอล',
     price: '89 ฿',
-    category: 'ของใช้ในหอ',
+    category: 'ของใช้ทั่วไป',
     is3D: false,
     isHot: true,
     imageDay: 'https://picsum.photos/id/48/600/400',
@@ -84,7 +84,7 @@ const PRODUCTS: Product[] = [
     id: 5,
     title: 'โคมไฟอ่านหนังสือตั้งโต๊ะ LED ถนอมสายตา',
     price: '150 ฿',
-    category: 'ของใช้ในหอ',
+    category: 'ของใช้ทั่วไป',
     is3D: true,
     isHot: false,
     imageDay: 'https://picsum.photos/id/201/600/400',
@@ -414,7 +414,7 @@ export default function CampusMarketplace() {
                 Campus Marketplace
               </h1>
               <p style={{ fontSize: '16px', color: theme.textSecondary, margin: 0, lineHeight: 1.6 }}>
-                ศูนย์รวมตลาดนัดออนไลน์ชาววิทยาศาสตร์ มิติใหม่ของการช้อปปิ้งในรั้วมหาวิทยาลัย
+                ศูนย์รวมตลาดนัดออนไลน์ชาววิทยาลัย มิติใหม่ของการช้อปปิ้งในรั้วมหาวิทยาลัย
                 <br />
                 สัมผัสประสบการณ์ซื้อขายแบบ 3D แบบเรียลไทม์
               </p>
@@ -455,7 +455,7 @@ export default function CampusMarketplace() {
                   width: 'fit-content'
                 }}
               >
-                เข้าสู่ตลาดเด็กหอ <ArrowRight style={{ width: '20px', height: '20px' }} />
+                เข้าสู่ตลาดวิทยาลัย <ArrowRight style={{ width: '20px', height: '20px' }} />
               </button>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

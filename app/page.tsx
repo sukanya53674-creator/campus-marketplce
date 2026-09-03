@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, 
   X, Rotate3d, ZoomIn, ZoomOut, RefreshCw, Search, Heart, ShoppingBag, ShieldCheck,
-  Compass, ArrowRight, CheckCircle2, MessageCircle, PhoneCall, User, MapPin, Phone
+  Compass, ArrowRight, CheckCircle2, MessageCircle, PhoneCall, User, MapPin, Phone, Zap
 } from 'lucide-react';
 
 interface Product {
@@ -131,6 +131,8 @@ export default function CampusMarketplace() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [cardState, setCardState] = useState<{ [key: number]: { x: number; y: number; mouseX: number; mouseY: number } }>({});
 
+  const [heroCardTransform, setHeroCardTransform] = useState({ rotateX: 0, rotateY: 0, glowX: 50, glowY: 50 });
+
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
   const [trailPos, setTrailPos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
 
@@ -138,10 +140,9 @@ export default function CampusMarketplace() {
   const particlesRef = useRef<Particle[]>([]);
 
   const [active3DModal, setActive3DModal] = useState<Product | null>(null);
-  const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null); // สำหรับ Modal กรอกฟอร์ม
-  const [orderedProduct, setOrderedProduct] = useState<Product | null>(null); // สำหรับ Modal ยืนยันสำเร็จ
+  const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null);
+  const [orderedProduct, setOrderedProduct] = useState<Product | null>(null);
 
-  // ข้อมูลฟอร์มผู้ซื้อ
   const [buyerName, setBuyerName] = useState('');
   const [buyerPhone, setBuyerPhone] = useState('');
   const [buyerAddress, setBuyerAddress] = useState('');
@@ -238,6 +239,28 @@ export default function CampusMarketplace() {
       cancelAnimationFrame(animId);
     };
   }, []);
+
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = ((y - centerY) / centerY) * -8;
+    const rotateY = ((x - centerX) / centerX) * 8;
+    
+    setHeroCardTransform({
+      rotateX,
+      rotateY,
+      glowX: (x / rect.width) * 100,
+      glowY: (y / rect.height) * 100
+    });
+  };
+
+  const handleHeroMouseLeave = () => {
+    setHeroCardTransform({ rotateX: 0, rotateY: 0, glowX: 50, glowY: 50 });
+  };
 
   const toggleFavorite = (id: number, e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -350,7 +373,7 @@ export default function CampusMarketplace() {
         position: 'fixed',
         inset: 0,
         zIndex: 1,
-        background: `radial-gradient(500px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(56, 189, 248, 0.15)' : 'rgba(99, 102, 241, 0.1)'}, rgba(168, 85, 247, 0.05) 50%, transparent 80%)`,
+        background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(56, 189, 248, 0.18)' : 'rgba(99, 102, 241, 0.12)'}, rgba(168, 85, 247, 0.08) 40%, transparent 80%)`,
       }} />
 
       <div style={{
@@ -387,39 +410,58 @@ export default function CampusMarketplace() {
       {currentView === 'hero' ? (
         <div style={{ 
           maxWidth: '850px', 
-          margin: '40px auto 0', 
+          margin: '20px auto 0', 
           display: 'flex', 
           flexDirection: 'column', 
           alignItems: 'center', 
           justifyContent: 'center',
           position: 'relative', 
           zIndex: 2,
-          minHeight: '80vh'
+          minHeight: '85vh',
+          perspective: '1200px'
         }}>
-          <div style={{
-            backgroundColor: theme.cardBg,
-            backdropFilter: 'blur(20px)',
-            border: `1px solid ${theme.border}`,
-            borderRadius: '36px',
-            padding: '48px 40px',
-            boxShadow: theme.shadow,
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px'
-          }}>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div 
+            onMouseMove={handleHeroMouseMove}
+            onMouseLeave={handleHeroMouseLeave}
+            style={{
+              backgroundColor: theme.cardBg,
+              backdropFilter: 'blur(24px)',
+              border: `1px solid ${theme.border}`,
+              borderRadius: '36px',
+              padding: '48px 40px',
+              boxShadow: isDarkMode 
+                ? '0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 50px rgba(56, 189, 248, 0.15)' 
+                : '0 20px 40px rgba(0, 0, 0, 0.08)',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '24px',
+              transform: `rotateX(${heroCardTransform.rotateX}deg) rotateY(${heroCardTransform.rotateY}deg)`,
+              transition: 'transform 0.1s cubic-bezier(0.2, 0, 0.2, 1)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: `radial-gradient(400px circle at ${heroCardTransform.glowX}% ${heroCardTransform.glowY}%, rgba(56, 189, 248, 0.12), transparent 70%)`,
+              pointerEvents: 'none'
+            }} />
+
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', zIndex: 2 }}>
               <span style={{ 
                 display: 'inline-flex', 
                 alignItems: 'center', 
                 gap: '6px', 
-                padding: '6px 14px', 
+                padding: '8px 16px', 
                 borderRadius: '20px', 
                 fontSize: '12px', 
                 fontWeight: 700, 
-                backgroundColor: 'rgba(16, 185, 129, 0.15)', 
+                backgroundColor: 'rgba(16, 185, 129, 0.12)', 
                 color: '#10b981', 
-                border: '1px solid rgba(16, 185, 129, 0.3)' 
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                boxShadow: '0 0 15px rgba(16, 185, 129, 0.2)'
               }}>
                 <CheckCircle2 style={{ width: '14px', height: '14px' }} /> VERIFIED CAMPUS NETWORK
               </span>
@@ -427,27 +469,29 @@ export default function CampusMarketplace() {
                 display: 'inline-flex', 
                 alignItems: 'center', 
                 gap: '6px', 
-                padding: '6px 14px', 
+                padding: '8px 16px', 
                 borderRadius: '20px', 
                 fontSize: '12px', 
                 fontWeight: 700, 
                 backgroundColor: 'rgba(139, 92, 246, 0.15)', 
-                color: '#a78bfa', 
-                border: '1px solid rgba(139, 92, 246, 0.3)' 
+                color: '#c084fc', 
+                border: '1px solid rgba(139, 92, 246, 0.3)',
+                boxShadow: '0 0 15px rgba(192, 132, 252, 0.2)'
               }}>
                 <Sparkles style={{ width: '14px', height: '14px' }} /> CampusHub 3D
               </span>
             </div>
 
-            <div>
+            <div style={{ zIndex: 2 }}>
               <h1 style={{ 
-                fontSize: '48px', 
+                fontSize: '52px', 
                 fontWeight: 900, 
                 margin: '0 0 12px 0', 
-                background: 'linear-gradient(135deg, #ffffff 30%, #38bdf8 100%)',
+                background: 'linear-gradient(135deg, #ffffff 20%, #38bdf8 60%, #c084fc 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: isDarkMode ? 'transparent' : 'inherit',
-                color: theme.textPrimary
+                color: theme.textPrimary,
+                letterSpacing: '-1px'
               }}>
                 Campus Marketplace
               </h1>
@@ -458,48 +502,96 @@ export default function CampusMarketplace() {
               </p>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', marginTop: '10px', flexWrap: 'wrap' }}>
-              <div style={{ flex: 1, minWidth: '140px', backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', border: `1px solid ${theme.border}`, padding: '16px', borderRadius: '18px', textAlign: 'center' }}>
-                <Box style={{ width: '22px', height: '22px', color: '#38bdf8', marginBottom: '8px' }} />
-                <div style={{ fontSize: '13px', fontWeight: 700 }}>3D Orbit</div>
+            <div style={{ display: 'flex', gap: '14px', marginTop: '6px', flexWrap: 'wrap', zIndex: 2 }}>
+              <div 
+                onClick={() => { setSelectedCategory('3d'); setCurrentView('market'); }}
+                style={{ 
+                  flex: 1, 
+                  minWidth: '140px', 
+                  backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', 
+                  border: `1px solid ${theme.border}`, 
+                  padding: '18px 16px', 
+                  borderRadius: '20px', 
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <Box style={{ width: '24px', height: '24px', color: '#38bdf8', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700 }}>3D Orbit</div>
               </div>
-              <div style={{ flex: 1, minWidth: '140px', backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', border: `1px solid ${theme.border}`, padding: '16px', borderRadius: '18px', textAlign: 'center' }}>
-                <Flame style={{ width: '22px', height: '22px', color: '#ef4444', marginBottom: '8px' }} />
-                <div style={{ fontSize: '13px', fontWeight: 700 }}>Hot Deals</div>
+
+              <div 
+                onClick={() => { setSelectedCategory('hot'); setCurrentView('market'); }}
+                style={{ 
+                  flex: 1, 
+                  minWidth: '140px', 
+                  backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', 
+                  border: `1px solid ${theme.border}`, 
+                  padding: '18px 16px', 
+                  borderRadius: '20px', 
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <Flame style={{ width: '24px', height: '24px', color: '#ef4444', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700 }}>Hot Deals</div>
               </div>
-              <div style={{ flex: 1, minWidth: '140px', backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', border: `1px solid ${theme.border}`, padding: '16px', borderRadius: '18px', textAlign: 'center' }}>
-                <Compass style={{ width: '22px', height: '22px', color: '#a78bfa', marginBottom: '8px' }} />
-                <div style={{ fontSize: '13px', fontWeight: 700 }}>Explore</div>
+
+              <div 
+                onClick={() => { setSelectedCategory('all'); setCurrentView('market'); }}
+                style={{ 
+                  flex: 1, 
+                  minWidth: '140px', 
+                  backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', 
+                  border: `1px solid ${theme.border}`, 
+                  padding: '18px 16px', 
+                  borderRadius: '20px', 
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <Compass style={{ width: '24px', height: '24px', color: '#a78bfa', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700 }}>Explore</div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '10px', zIndex: 2 }}>
               <button
                 onClick={() => setCurrentView('market')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '10px',
-                  padding: '16px 32px',
-                  borderRadius: '20px',
+                  gap: '12px',
+                  padding: '18px 36px',
+                  borderRadius: '22px',
                   background: 'linear-gradient(135deg, #8b5cf6, #d946ef)',
                   color: '#ffffff',
                   fontSize: '16px',
                   fontWeight: 800,
                   border: 'none',
                   cursor: 'pointer',
-                  boxShadow: '0 10px 30px rgba(217, 70, 239, 0.4)',
-                  width: 'fit-content'
+                  boxShadow: '0 12px 35px rgba(217, 70, 239, 0.45)',
+                  width: 'fit-content',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                 }}
               >
                 เข้าสู่ตลาดวิทยาลัย <ArrowRight style={{ width: '20px', height: '20px' }} />
               </button>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '12px', color: theme.textSecondary }}>กำลังเชื่อมต่อนวัตกรรมระบบ</span>
-                <div style={{ flex: 1, height: '6px', backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0', borderRadius: '10px', overflow: 'hidden' }}>
-                  <div style={{ width: '100%', height: '100%', background: 'linear-gradient(90deg, #38bdf8, #d946ef)', borderRadius: '10px' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
+                <span style={{ fontSize: '12px', color: theme.textSecondary, whiteSpace: 'nowrap' }}>กำลังเชื่อมต่อนวัตกรรมระบบ</span>
+                <div style={{ flex: 1, height: '6px', backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0', borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
+                  <div style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    background: 'linear-gradient(90deg, #38bdf8, #8b5cf6, #d946ef)', 
+                    borderRadius: '10px',
+                    boxShadow: '0 0 10px #d946ef'
+                  }} />
                 </div>
                 <span style={{ fontSize: '12px', fontWeight: 800, color: '#38bdf8' }}>100%</span>
               </div>
@@ -1273,7 +1365,6 @@ export default function CampusMarketplace() {
               </p>
             </div>
 
-            {/* ข้อมูลสรุปการสั่งซื้อของผู้ซื้อ */}
             <div style={{
               width: '100%',
               backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',

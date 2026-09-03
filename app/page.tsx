@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, 
   X, Rotate3d, ZoomIn, ZoomOut, RefreshCw, Search, Heart, ShoppingBag, ShieldCheck,
-  Compass, ArrowRight, CheckCircle2, MessageCircle, PhoneCall
+  Compass, ArrowRight, CheckCircle2, MessageCircle, PhoneCall, User, MapPin, Phone
 } from 'lucide-react';
 
 interface Product {
@@ -138,7 +138,14 @@ export default function CampusMarketplace() {
   const particlesRef = useRef<Particle[]>([]);
 
   const [active3DModal, setActive3DModal] = useState<Product | null>(null);
-  const [orderedProduct, setOrderedProduct] = useState<Product | null>(null); // สำหรับแสดง Popup สั่งซื้อสำเร็จ
+  const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null); // สำหรับ Modal กรอกฟอร์ม
+  const [orderedProduct, setOrderedProduct] = useState<Product | null>(null); // สำหรับ Modal ยืนยันสำเร็จ
+
+  // ข้อมูลฟอร์มผู้ซื้อ
+  const [buyerName, setBuyerName] = useState('');
+  const [buyerPhone, setBuyerPhone] = useState('');
+  const [buyerAddress, setBuyerAddress] = useState('');
+
   const [rotation, setRotation] = useState<{ x: number; y: number }>({ x: 15, y: -25 });
   const [zoom, setZoom] = useState<number>(1);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -297,9 +304,19 @@ export default function CampusMarketplace() {
     setZoom(1);
   };
 
-  const handleOrder = (product: Product) => {
+  const openCheckoutModal = (product: Product) => {
     setActive3DModal(null);
-    setOrderedProduct(product);
+    setCheckoutProduct(product);
+  };
+
+  const handleSubmitOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!buyerName || !buyerPhone) {
+      alert('กรุณากรอกชื่อและเบอร์โทรศัพท์');
+      return;
+    }
+    setOrderedProduct(checkoutProduct);
+    setCheckoutProduct(null);
   };
 
   const theme = {
@@ -312,6 +329,7 @@ export default function CampusMarketplace() {
     dockBg: isDarkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
     shadow: isDarkMode ? '0 20px 50px rgba(0,0,0,0.8)' : '0 10px 30px rgba(0,0,0,0.05)',
     modalOverlay: isDarkMode ? 'rgba(2, 6, 23, 0.92)' : 'rgba(255, 255, 255, 0.92)',
+    inputBg: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#f1f5f9',
   };
 
   return (
@@ -1030,7 +1048,7 @@ export default function CampusMarketplace() {
                 <span style={{ fontSize: '26px', fontWeight: 900, color: isDarkMode ? '#38bdf8' : '#2563eb' }}>{active3DModal.price}</span>
               </div>
               <button 
-                onClick={() => handleOrder(active3DModal)}
+                onClick={() => openCheckoutModal(active3DModal)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -1049,6 +1067,136 @@ export default function CampusMarketplace() {
                 ติดต่อสั่งซื้อทันที
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Checkout Input Modal */}
+      {checkoutProduct && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 60,
+          backgroundColor: theme.modalOverlay,
+          backdropFilter: 'blur(24px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '520px',
+            backgroundColor: isDarkMode ? '#0a0f1d' : '#ffffff',
+            borderRadius: '32px',
+            border: isDarkMode ? '1px solid rgba(139, 92, 246, 0.4)' : '1px solid rgba(0,0,0,0.1)',
+            padding: '32px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+          }}>
+            <button
+              onClick={() => setCheckoutProduct(null)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.06)' : '#f1f5f9',
+                border: 'none',
+                color: theme.textPrimary,
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <X style={{ width: '18px', height: '18px' }} />
+            </button>
+
+            <div>
+              <h3 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 4px 0', color: theme.textPrimary }}>
+                กรอกข้อมูลสำหรับการสั่งซื้อ
+              </h3>
+              <p style={{ fontSize: '13px', color: theme.textSecondary, margin: 0 }}>
+                ระบุข้อมูลของคุณเพื่อให้ผู้ขายติดต่อกลับได้สะดวก
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmitOrder} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: theme.textSecondary, display: 'block', marginBottom: '6px' }}>
+                  ชื่อ-นามสกุล ผู้ซื้อ *
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', backgroundColor: theme.inputBg, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '0 14px' }}>
+                  <User style={{ width: '16px', height: '16px', color: theme.textSecondary, marginRight: '10px' }} />
+                  <input
+                    type="text"
+                    required
+                    placeholder="เช่น สมชาย ใจดี"
+                    value={buyerName}
+                    onChange={(e) => setBuyerName(e.target.value)}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', padding: '12px 0', color: theme.textPrimary, fontSize: '14px' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: theme.textSecondary, display: 'block', marginBottom: '6px' }}>
+                  เบอร์โทรศัพท์ติดต่อ *
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', backgroundColor: theme.inputBg, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '0 14px' }}>
+                  <Phone style={{ width: '16px', height: '16px', color: theme.textSecondary, marginRight: '10px' }} />
+                  <input
+                    type="tel"
+                    required
+                    placeholder="เช่น 081-234-5678"
+                    value={buyerPhone}
+                    onChange={(e) => setBuyerPhone(e.target.value)}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', padding: '12px 0', color: theme.textPrimary, fontSize: '14px' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: theme.textSecondary, display: 'block', marginBottom: '6px' }}>
+                  สถานที่นัดรับ / หอพัก (ถ้ามี)
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', backgroundColor: theme.inputBg, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '0 14px' }}>
+                  <MapPin style={{ width: '16px', height: '16px', color: theme.textSecondary, marginRight: '10px' }} />
+                  <input
+                    type="text"
+                    placeholder="เช่น หอพัก A ห้อง 302 หรือ นัดรับหน้าตึกเรียน"
+                    value={buyerAddress}
+                    onChange={(e) => setBuyerAddress(e.target.value)}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', padding: '12px 0', color: theme.textPrimary, fontSize: '14px' }}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #8b5cf6, #d946ef)',
+                  color: '#ffffff',
+                  border: 'none',
+                  fontWeight: 800,
+                  fontSize: '15px',
+                  cursor: 'pointer',
+                  marginTop: '10px',
+                  boxShadow: '0 8px 20px rgba(217, 70, 239, 0.3)'
+                }}
+              >
+                ยืนยันการสั่งซื้อ
+              </button>
+            </form>
           </div>
         </div>
       )}
@@ -1120,9 +1268,28 @@ export default function CampusMarketplace() {
               <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px 0', color: theme.textPrimary }}>
                 สั่งซื้อสำเร็จ!
               </h3>
-              <p style={{ fontSize: '14px', color: theme.textSecondary, margin: 0 }}>
-                กรุณาติดต่อผู้ขายโดยตรงผ่านช่องทางด้านล่างนี้
+              <p style={{ fontSize: '13px', color: theme.textSecondary, margin: 0 }}>
+                ส่งข้อมูลผู้ซื้อถึงผู้ขายเรียบร้อยแล้ว ท่านสามารถติดต่อผู้ขายเพิ่มเติมได้ที่ช่องทางด้านล่าง
               </p>
+            </div>
+
+            {/* ข้อมูลสรุปการสั่งซื้อของผู้ซื้อ */}
+            <div style={{
+              width: '100%',
+              backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',
+              border: `1px solid ${theme.border}`,
+              borderRadius: '18px',
+              padding: '14px',
+              textAlign: 'left',
+              fontSize: '13px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px'
+            }}>
+              <div style={{ fontWeight: 700, color: theme.textPrimary }}>ข้อมูลผู้ซื้อ:</div>
+              <div style={{ color: theme.textSecondary }}>ชื่อ: {buyerName}</div>
+              <div style={{ color: theme.textSecondary }}>เบอร์โทร: {buyerPhone}</div>
+              {buyerAddress && <div style={{ color: theme.textSecondary }}>สถานที่รับ: {buyerAddress}</div>}
             </div>
 
             <div style={{
@@ -1166,7 +1333,7 @@ export default function CampusMarketplace() {
                   fontSize: '14px'
                 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <MessageCircle style={{ width: '18px', height: '18px' }} /> Line ID
+                    <MessageCircle style={{ width: '18px', height: '18px' }} /> Line ID ผู้ขาย
                   </span>
                   <span>{orderedProduct.sellerLine}</span>
                 </div>
@@ -1186,7 +1353,7 @@ export default function CampusMarketplace() {
                   fontSize: '14px'
                 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <PhoneCall style={{ width: '18px', height: '18px' }} /> เบอร์โทรศัพท์
+                    <PhoneCall style={{ width: '18px', height: '18px' }} /> เบอร์โทรผู้ขาย
                   </span>
                   <span>{orderedProduct.sellerPhone}</span>
                 </div>
@@ -1209,7 +1376,7 @@ export default function CampusMarketplace() {
                 boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)'
               }}
             >
-              รับทราบ / ตกลง
+              ตกลง / ปิดหน้าต่าง
             </button>
           </div>
         </div>

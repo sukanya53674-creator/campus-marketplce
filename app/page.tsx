@@ -1,292 +1,758 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ShieldCheck, Sparkles, Box, Flame, Compass, ArrowRight, Activity, Zap, Layers } from 'lucide-react';
-import ProductSection from './home/page';
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, 
+  X, Rotate3d, ZoomIn, ZoomOut, RefreshCw, Search, Heart, ShoppingBag
+} from 'lucide-react';
 
-export default function LandingPage() {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [progress, setProgress] = useState(52);
-  const [showMainStore, setShowMainStore] = useState(false);
+interface Product {
+  id: number;
+  title: string;
+  price: string;
+  category: string;
+  is3D: boolean;
+  isHot: boolean;
+  imageDay: string;
+  imageNight: string;
+  glowColor: string;
+  condition: string;
+}
+
+const PRODUCTS: Product[] = [
+  {
+    id: 1,
+    title: 'ชีทสรุป Calculus II พร้อมแนวข้อสอบเก่า',
+    price: '45 ฿',
+    category: 'หนังสือ & ชีทสรุป',
+    is3D: true,
+    isHot: true,
+    imageDay: 'https://picsum.photos/id/24/600/400',
+    imageNight: 'https://picsum.photos/id/24/600/400',
+    glowColor: 'rgba(99, 102, 241, 0.45)',
+    condition: 'ไฟล์ PDF / เล่มปริ้นท์',
+  },
+  {
+    id: 2,
+    title: 'เครื่องคิดเลข Casio FX-350MS มือสอง',
+    price: '180 ฿',
+    category: 'อุปกรณ์การเรียน',
+    is3D: true,
+    isHot: false,
+    imageDay: 'https://picsum.photos/id/160/600/400',
+    imageNight: 'https://picsum.photos/id/160/600/400',
+    glowColor: 'rgba(236, 72, 153, 0.45)',
+    condition: 'สภาพ 85% ใช้งานได้ปกติ',
+  },
+  {
+    id: 3,
+    title: 'ปากกา Stylus สำหรับ iPad (วางมือบนจอได้)',
+    price: '290 ฿',
+    category: 'ไอที & อุปกรณ์เสริม',
+    is3D: true,
+    isHot: true,
+    imageDay: 'https://picsum.photos/id/0/600/400',
+    imageNight: 'https://picsum.photos/id/0/600/400',
+    glowColor: 'rgba(59, 130, 246, 0.45)',
+    condition: 'ของใหม่ มือ 1',
+  },
+  {
+    id: 4,
+    title: 'พัดลมพกพาชาร์จ USB สายมินิมอล',
+    price: '89 ฿',
+    category: 'ของใช้ในหอ',
+    is3D: false,
+    isHot: true,
+    imageDay: 'https://picsum.photos/id/48/600/400',
+    imageNight: 'https://picsum.photos/id/48/600/400',
+    glowColor: 'rgba(245, 158, 11, 0.45)',
+    condition: 'สภาพ 95% แบตยังอึด',
+  },
+  {
+    id: 5,
+    title: 'โคมไฟอ่านหนังสือตั้งโต๊ะ LED ถนอมสายตา',
+    price: '150 ฿',
+    category: 'ของใช้ในหอ',
+    is3D: true,
+    isHot: false,
+    imageDay: 'https://picsum.photos/id/201/600/400',
+    imageNight: 'https://picsum.photos/id/201/600/400',
+    glowColor: 'rgba(16, 185, 129, 0.45)',
+    condition: 'สภาพ 90%',
+  },
+  {
+    id: 6,
+    title: 'จอคอมมือสอง 20 นิ้ว สำหรับต่อสองจอเรียน',
+    price: '850 ฿',
+    category: 'ไอที & อุปกรณ์เสริม',
+    is3D: true,
+    isHot: false,
+    imageDay: 'https://picsum.photos/id/1/600/400',
+    imageNight: 'https://picsum.photos/id/1/600/400',
+    glowColor: 'rgba(168, 85, 247, 0.45)',
+    condition: 'สภาพ 80% มีรอยตามการใช้งาน',
+  },
+];
+
+export default function ProductPage() {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [selectedCategory, setSelectedCategory] = useState<'all' | '3d' | 'hot'>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [cardState, setCardState] = useState<{ [key: number]: { x: number; y: number; mouseX: number; mouseY: number } }>({});
+
+  // Cursor Trail Effects
+  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
+  const [trailPos, setTrailPos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
+
+  const [active3DModal, setActive3DModal] = useState<Product | null>(null);
+  const [rotation, setRotation] = useState<{ x: number; y: number }>({ x: 15, y: -25 });
+  const [zoom, setZoom] = useState<number>(1);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const { innerWidth, innerHeight } = window;
-      const x = (e.clientX / innerWidth - 0.5) * 30; // องศาการหมุน 3D
-      const y = (e.clientY / innerHeight - 0.5) * -30;
-      setMousePos({ x, y });
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
     };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
   }, []);
 
-  // จำลอง Progress เพิ่มขึ้นทีละนิดเพิ่มความสมจริง
+  // Smooth Smooth Motion for Trail Effect
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => (prev < 99 ? prev + 1 : 100));
-    }, 1500);
-    return () => clearInterval(timer);
-  }, []);
+    let animationFrameId: number;
+    const updateTrail = () => {
+      setTrailPos((prev) => ({
+        x: prev.x + (mousePos.x - prev.x) * 0.15,
+        y: prev.y + (mousePos.y - prev.y) * 0.15,
+      }));
+      animationFrameId = requestAnimationFrame(updateTrail);
+    };
+    animationFrameId = requestAnimationFrame(updateTrail);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [mousePos]);
 
-  if (showMainStore) {
-    return <ProductSection />;
-  }
+  const toggleFavorite = (id: number, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const filteredProducts = PRODUCTS.filter((item) => {
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          item.category.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+    if (selectedCategory === '3d') return item.is3D;
+    if (selectedCategory === 'hot') return item.isHot;
+    return true;
+  });
+
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>, id: number) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -14;
+    const rotateY = ((x - centerX) / centerX) * 14;
+
+    setCardState((prev) => ({
+      ...prev,
+      [id]: { x: rotateX, y: rotateY, mouseX: x, mouseY: y },
+    }));
+  };
+
+  const handleCardMouseLeave = (id: number) => {
+    setCardState((prev) => ({
+      ...prev,
+      [id]: { x: 0, y: 0, mouseX: 0, mouseY: 0 },
+    }));
+    setHoveredCard(null);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    dragStart.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - dragStart.current.x;
+    const deltaY = e.clientY - dragStart.current.y;
+
+    setRotation((prev) => ({
+      x: Math.max(-60, Math.min(60, prev.x - deltaY * 0.5)),
+      y: prev.y + deltaX * 0.8,
+    }));
+
+    dragStart.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
+
+  const open3DModal = (product: Product) => {
+    setActive3DModal(product);
+    setRotation({ x: 15, y: -25 });
+    setZoom(1);
+  };
+
+  const theme = {
+    bg: isDarkMode ? '#05070f' : '#f8fafc',
+    cardBg: isDarkMode ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+    textPrimary: isDarkMode ? '#ffffff' : '#0f172a',
+    textSecondary: isDarkMode ? '#94a3b8' : '#64748b',
+    border: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+    borderHover: isDarkMode ? '#818cf8' : '#6366f1',
+    dockBg: isDarkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+    shadow: isDarkMode ? '0 20px 50px rgba(0,0,0,0.8)' : '0 10px 30px rgba(0,0,0,0.05)',
+    modalOverlay: isDarkMode ? 'rgba(3, 7, 18, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+    gridColor: isDarkMode ? 'rgba(99,102,241,0.15)' : 'rgba(99,102,241,0.08)',
+  };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#030712',
-      color: '#f9fafb',
-      fontFamily: "'Inter', sans-serif",
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'relative',
-      overflow: 'hidden',
-      perspective: '1000px',
-      padding: '20px'
-    }}>
-      {/* 3D Cyber Background Grid */}
-      <div style={{
-        position: 'absolute',
-        inset: '-200px',
-        backgroundImage: `
-          radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 70%),
-          linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
-        `,
-        backgroundSize: '100% 100%, 40px 40px, 40px 40px',
-        transform: `rotateX(60deg) translateY(-100px) translateZ(-200px)`,
-        transformStyle: 'preserve-3d',
-        pointerEvents: 'none'
-      }} />
+    <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '32px 24px', color: theme.textPrimary, fontFamily: "'Inter', sans-serif", transition: 'background-color 0.4s ease', position: 'relative', overflow: 'hidden' }}>
+      
+      {/* 1. Light Glow Follower (ใหญ่ นุ่มนวล) */}
+      <div
+        style={{
+          pointerEvents: 'none',
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1,
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(99, 102, 241, 0.18)' : 'rgba(99, 102, 241, 0.08)'}, transparent 80%)`,
+        }}
+      />
 
-      {/* Glow Orbs background */}
-      <div style={{
-        position: 'absolute',
-        top: '20%',
-        left: '15%',
-        width: '300px',
-        height: '300px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%)',
-        filter: 'blur(60px)',
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '20%',
-        right: '15%',
-        width: '350px',
-        height: '350px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(6,182,212,0.3) 0%, transparent 70%)',
-        filter: 'blur(70px)',
-        pointerEvents: 'none'
-      }} />
+      {/* 2. Dynamic Cursor Smooth Trail Effect (วงแหวนวิ่งตามแบบนุ่มนวล) */}
+      <div
+        style={{
+          pointerEvents: 'none',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          border: '2px solid rgba(168, 85, 247, 0.6)',
+          backgroundColor: 'rgba(99, 102, 241, 0.15)',
+          boxShadow: '0 0 15px rgba(168, 85, 247, 0.5)',
+          transform: `translate(${trailPos.x - 18}px, ${trailPos.y - 18}px)`,
+          zIndex: 9999,
+          backdropFilter: 'blur(2px)',
+          transition: 'width 0.2s, height 0.2s',
+        }}
+      />
 
-      {/* Main 3D Interactive Card Container */}
-      <div style={{
-        position: 'relative',
-        zIndex: 10,
-        maxWidth: '850px',
-        width: '100%',
-        backgroundColor: 'rgba(15, 23, 42, 0.65)',
-        backdropFilter: 'blur(20px)',
-        borderRadius: '32px',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
-        boxShadow: '0 30px 100px -20px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(99, 102, 241, 0.15)',
-        padding: '48px',
-        transform: `rotateX(${mousePos.y * 0.5}deg) rotateY(${mousePos.x * 0.5}deg)`,
-        transition: 'transform 0.1s ease-out',
-        transformStyle: 'preserve-3d',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '32px'
-      }}>
+      {/* 3. Center Glow Dot (จุดตรงปลายเมาส์) */}
+      <div
+        style={{
+          pointerEvents: 'none',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: '#38bdf8',
+          boxShadow: '0 0 10px #38bdf8, 0 0 20px #818cf8',
+          transform: `translate(${mousePos.x - 4}px, ${mousePos.y - 4}px)`,
+          zIndex: 10000,
+        }}
+      />
 
-        {/* Header Badges */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', transform: 'translateZ(30px)' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px', position: 'relative', zIndex: 2 }}>
+        
+        {/* Navigation & Controls */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            backgroundColor: 'rgba(16, 185, 129, 0.15)',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
-            color: '#34d399',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '0.5px'
-          }}>
-            <ShieldCheck style={{ width: '14px', height: '14px' }} />
-            VERIFIED CAMPUS NETWORK
-          </div>
-
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            backgroundColor: 'rgba(99, 102, 241, 0.15)',
-            border: '1px solid rgba(99, 102, 241, 0.4)',
-            color: '#a5b4fc',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            fontSize: '11px',
-            fontWeight: 700,
-          }}>
-            <Sparkles style={{ width: '14px', height: '14px', color: '#c084fc' }} />
-            CampusHub 3D
-          </div>
-        </div>
-
-        {/* Title & Description */}
-        <div style={{ transform: 'translateZ(40px)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <h1 style={{
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-            fontWeight: 900,
-            margin: 0,
-            lineHeight: 1.1,
-            background: 'linear-gradient(135deg, #ffffff 30%, #a5b4fc 70%, #67e8f9 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            textShadow: '0 10px 30px rgba(0,0,0,0.5)'
-          }}>
-            Campus Marketplace
-          </h1>
-          <p style={{
-            fontSize: '16px',
-            color: '#94a3b8',
-            margin: 0,
-            maxWidth: '560px',
-            lineHeight: 1.6
-          }}>
-            ศูนย์รวมตลาดนัดออนไลน์ชาววิทยาศาสตร์ มิติใหม่ของการช้อปปิ้งในรั้วมหาวิทยาลัย สัมผัสประสบการณ์ซื้อขายแบบ 3D แบบเรียลไทม์
-          </p>
-        </div>
-
-        {/* Experimental 3D Navigation Control Deck */}
-        <div style={{ transform: 'translateZ(35px)' }}>
-          <p style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            color: '#64748b',
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            marginBottom: '12px',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px'
+            gap: '8px',
+            padding: '6px',
+            backgroundColor: theme.dockBg,
+            backdropFilter: 'blur(16px)',
+            border: `1px solid ${theme.border}`,
+            borderRadius: '20px',
+            boxShadow: theme.shadow
           }}>
-            <Zap style={{ width: '12px', height: '12px', color: '#f59e0b' }} />
-            Experimental 3D Navigation
-          </p>
+            <button
+              onClick={() => setSelectedCategory('all')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: '14px',
+                fontSize: '13px',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: selectedCategory === 'all' ? 'linear-gradient(135deg, #4f46e5, #9333ea)' : 'transparent',
+                color: selectedCategory === 'all' ? '#ffffff' : theme.textSecondary,
+              }}
+            >
+              <Layers style={{ width: '16px', height: '16px' }} />
+              ทั้งหมด ({PRODUCTS.length})
+            </button>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '14px' }}>
-            {[
-              { label: '3D Orbit', icon: Box, color: '#06b6d4' },
-              { label: 'Hot Deals', icon: Flame, color: '#f43f5e' },
-              { label: 'Explore', icon: Compass, color: '#a855f7' },
-            ].map((node, i) => (
-              <div
-                key={i}
+            <button
+              onClick={() => setSelectedCategory('3d')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: '14px',
+                fontSize: '13px',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: selectedCategory === '3d' ? 'linear-gradient(135deg, #06b6d4, #2563eb)' : 'transparent',
+                color: selectedCategory === '3d' ? '#ffffff' : theme.textSecondary,
+              }}
+            >
+              <Box style={{ width: '16px', height: '16px' }} />
+              โมเดล 3D
+            </button>
+
+            <button
+              onClick={() => setSelectedCategory('hot')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: '14px',
+                fontSize: '13px',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: selectedCategory === 'hot' ? 'linear-gradient(135deg, #f59e0b, #e11d48)' : 'transparent',
+                color: selectedCategory === 'hot' ? '#ffffff' : theme.textSecondary,
+              }}
+            >
+              <Flame style={{ width: '16px', height: '16px' }} />
+              สินค้ามาแรง
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: theme.dockBg,
+              backdropFilter: 'blur(16px)',
+              border: `1px solid ${theme.border}`,
+              borderRadius: '18px',
+              padding: '4px 14px',
+              minWidth: '240px'
+            }}>
+              <Search style={{ width: '16px', height: '16px', color: theme.textSecondary, marginRight: '8px' }} />
+              <input
+                type="text"
+                placeholder="ค้นหาสินค้า..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
-                  backgroundColor: 'rgba(30, 41, 59, 0.7)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '16px',
-                  padding: '14px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: theme.textPrimary,
+                  fontSize: '13px',
+                  width: '100%',
+                  fontWeight: 500
+                }}
+              />
+              {searchQuery && (
+                <X 
+                  onClick={() => setSearchQuery('')}
+                  style={{ width: '14px', height: '14px', color: theme.textSecondary, cursor: 'pointer' }} 
+                />
+              )}
+            </div>
+
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '46px',
+                height: '46px',
+                borderRadius: '16px',
+                backgroundColor: theme.dockBg,
+                backdropFilter: 'blur(16px)',
+                border: `1px solid ${theme.border}`,
+                color: theme.textPrimary,
+                cursor: 'pointer',
+              }}
+            >
+              {isDarkMode ? <Sun style={{ width: '20px', height: '20px', color: '#fbbf24' }} /> : <Moon style={{ width: '20px', height: '20px', color: '#4f46e5' }} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Section Title */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', fontWeight: 800, margin: 0 }}>
+            <Sparkles style={{ width: '20px', height: '20px', color: '#6366f1' }} />
+            รายการสินค้าไฮไลท์
+          </h3>
+          <span style={{ fontSize: '12px', color: isDarkMode ? '#a5b4fc' : '#4f46e5', backgroundColor: theme.dockBg, border: `1px solid ${theme.border}`, padding: '4px 14px', borderRadius: '20px', fontWeight: 600 }}>
+            พบ {filteredProducts.length} รายการ
+          </span>
+        </div>
+
+        {/* Product Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '24px', perspective: '1200px' }}>
+          {filteredProducts.map((item) => {
+            const state = cardState[item.id] || { x: 0, y: 0, mouseX: 0, mouseY: 0 };
+            const isHovered = hoveredCard === item.id;
+            const isFav = favorites.includes(item.id);
+            const currentImage = isDarkMode ? item.imageNight : item.imageDay;
+
+            return (
+              <div
+                key={item.id}
+                onMouseMove={(e) => handleCardMouseMove(e, item.id)}
+                onMouseEnter={() => setHoveredCard(item.id)}
+                onMouseLeave={() => handleCardMouseLeave(item.id)}
+                style={{
+                  transform: `rotateX(${state.x}deg) rotateY(${state.y}deg)`,
+                  transformStyle: 'preserve-3d',
+                  position: 'relative',
+                  borderRadius: '28px',
+                  backgroundColor: theme.cardBg,
+                  backdropFilter: 'blur(16px)',
+                  border: isHovered ? `1px solid ${theme.borderHover}` : `1px solid ${theme.border}`,
+                  padding: '18px',
+                  transition: isHovered ? 'transform 0.05s linear' : 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: isHovered ? `0 25px 50px -12px ${item.glowColor}` : theme.shadow,
                   cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-6px) translateZ(15px)';
-                  e.currentTarget.style.borderColor = node.color;
-                  e.currentTarget.style.boxShadow = `0 12px 25px -5px ${node.color}55`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) translateZ(0)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+                  overflow: 'hidden'
                 }}
               >
-                <node.icon style={{ width: '22px', height: '22px', color: node.color }} />
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#e2e8f0' }}>{node.label}</span>
+                <button
+                  onClick={(e) => toggleFavorite(item.id, e)}
+                  style={{
+                    position: 'absolute',
+                    top: '26px',
+                    right: '26px',
+                    zIndex: 10,
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '50%',
+                    width: '34px',
+                    height: '34px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Heart style={{ width: '16px', height: '16px', color: isFav ? '#ec4899' : '#ffffff', fill: isFav ? '#ec4899' : 'none' }} />
+                </button>
+
+                <div style={{
+                  transform: 'translateZ(30px)',
+                  position: 'relative',
+                  width: '100%',
+                  height: '200px',
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0',
+                  marginBottom: '16px',
+                }}>
+                  <img
+                    src={currentImage}
+                    alt={item.title}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+                      transition: 'transform 0.5s ease-out'
+                    }}
+                  />
+
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundColor: 'rgba(15, 23, 42, 0.75)',
+                    backdropFilter: 'blur(6px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: isHovered ? 1 : 0,
+                    transition: 'all 0.3s'
+                  }}>
+                    <button
+                      onClick={() => open3DModal(item)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '12px 22px',
+                        background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '14px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: '0 8px 25px rgba(99,102,241,0.6)',
+                      }}
+                    >
+                      <Eye style={{ width: '18px', height: '18px' }} /> กดดูภาพ 3D
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ transform: 'translateZ(25px)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{
+                      fontSize: '11px',
+                      color: isDarkMode ? '#a5b4fc' : '#4f46e5',
+                      fontWeight: 600,
+                      backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)',
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                    }}>
+                      <Tag style={{ width: '12px', height: '12px', display: 'inline', marginRight: '4px' }} />
+                      {item.category}
+                    </span>
+                    <ArrowUpRight style={{ width: '18px', height: '18px', color: theme.textSecondary }} />
+                  </div>
+
+                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: theme.textPrimary, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item.title}
+                  </h4>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <div>
+                      <p style={{ fontSize: '11px', color: theme.textSecondary, margin: 0 }}>ราคาเริ่มต้น</p>
+                      <span style={{ fontSize: '20px', fontWeight: 900, color: isDarkMode ? '#c084fc' : '#7c3aed' }}>
+                        {item.price}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', color: '#10b981', backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.15)' : '#d1fae5', padding: '4px 10px', borderRadius: '10px', fontWeight: 700 }}>
+                      {item.condition}
+                    </span>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
-
-        {/* Action Button & Progress */}
-        <div style={{
-          transform: 'translateZ(50px)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          paddingTop: '8px'
-        }}>
-          <button
-            onClick={() => setShowMainStore(true)}
-            style={{
-              alignSelf: 'flex-start',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '16px 36px',
-              borderRadius: '20px',
-              background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #d946ef 100%)',
-              color: '#ffffff',
-              fontSize: '16px',
-              fontWeight: 800,
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 10px 30px rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255,255,255,0.3)',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05) translateZ(10px)';
-              e.currentTarget.style.boxShadow = '0 15px 40px rgba(168, 85, 247, 0.7)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1) translateZ(0)';
-              e.currentTarget.style.boxShadow = '0 10px 30px rgba(99, 102, 241, 0.5)';
-            }}
-          >
-            เข้าสู่ตลาดเด็กหอ
-            <ArrowRight style={{ width: '20px', height: '20px' }} />
-          </button>
-
-          {/* System Sync Status */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxWidth: '300px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#94a3b8', fontWeight: 600 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Activity style={{ width: '12px', height: '12px', color: '#38bdf8' }} />
-                กำลังเชื่อมต่อมิติระบบ
-              </span>
-              <span style={{ color: '#38bdf8', fontWeight: 700 }}>{progress}%</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '10px', overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                width: `${progress}%`,
-                background: 'linear-gradient(to right, #38bdf8, #818cf8, #c084fc)',
-                borderRadius: '10px',
-                transition: 'width 0.5s ease-out',
-                boxShadow: '0 0 10px #38bdf8'
-              }} />
-            </div>
-          </div>
-        </div>
-
       </div>
+
+      {/* 3D INTERACTIVE MODAL */}
+      {active3DModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 50,
+          backgroundColor: theme.modalOverlay,
+          backdropFilter: 'blur(20px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '720px',
+            backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+            borderRadius: '32px',
+            border: `1px solid ${theme.border}`,
+            padding: '28px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            boxShadow: theme.shadow
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Rotate3d style={{ width: '24px', height: '24px', color: '#06b6d4' }} />
+                <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: theme.textPrimary }}>
+                  3D Interactive Viewer: {active3DModal.title}
+                </h3>
+              </div>
+              <button
+                onClick={() => setActive3DModal(null)}
+                style={{
+                  backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : '#f1f5f9',
+                  border: 'none',
+                  color: theme.textPrimary,
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <X style={{ width: '20px', height: '20px' }} />
+              </button>
+            </div>
+
+            <div
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '420px',
+                borderRadius: '24px',
+                overflow: 'hidden',
+                backgroundColor: isDarkMode ? '#020617' : '#f8fafc',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                perspective: '1000px',
+                cursor: isDragging ? 'grabbing' : 'grab',
+                userSelect: 'none'
+              }}
+            >
+              <div style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                backgroundImage: `radial-gradient(circle, ${theme.gridColor} 1.5px, transparent 1.5px)`,
+                backgroundSize: '30px 30px',
+                pointerEvents: 'none'
+              }} />
+
+              {/* 3D Platform & Shadow Canvas */}
+              <div style={{
+                transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${zoom})`,
+                transformStyle: 'preserve-3d',
+                transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.2, 0, 0.2, 1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative'
+              }}>
+                {/* Floor Pedestal Base */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-50px',
+                  width: '280px',
+                  height: '280px',
+                  borderRadius: '50%',
+                  background: isDarkMode 
+                    ? 'radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(15, 23, 42, 0) 70%)'
+                    : 'radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(255, 255, 255, 0) 70%)',
+                  transform: 'rotateX(80deg) translateZ(-60px)',
+                  border: isDarkMode ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid rgba(99, 102, 241, 0.15)',
+                  pointerEvents: 'none'
+                }} />
+
+                {/* Floor Dynamic Shadow */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-35px',
+                  width: '240px',
+                  height: '45px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  filter: 'blur(14px)',
+                  transform: `rotateX(75deg) translateZ(-40px) translateX(${-rotation.y * 0.8}px)`,
+                  opacity: Math.max(0.3, 1 - Math.abs(rotation.x) / 90),
+                  pointerEvents: 'none'
+                }} />
+
+                {/* 3D Image Object */}
+                <img
+                  src={isDarkMode ? active3DModal.imageNight : active3DModal.imageDay}
+                  alt={active3DModal.title}
+                  draggable={false}
+                  style={{
+                    maxWidth: '280px',
+                    maxHeight: '280px',
+                    objectFit: 'cover',
+                    borderRadius: '22px',
+                    transform: 'translateZ(25px)',
+                    border: isDarkMode ? '2px solid rgba(255, 255, 255, 0.35)' : '2px solid rgba(255, 255, 255, 0.9)',
+                    boxShadow: `${-rotation.y * 0.6}px ${rotation.x * 0.6 + 20}px 35px rgba(0, 0, 0, 0.65), 0 0 25px ${active3DModal.glowColor}`,
+                  }}
+                />
+              </div>
+
+              <div style={{
+                position: 'absolute',
+                bottom: '18px',
+                left: '18px',
+                backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                color: isDarkMode ? '#67e8f9' : '#0284c7',
+                fontSize: '12px',
+                fontWeight: 700,
+                padding: '8px 16px',
+                borderRadius: '20px',
+                backdropFilter: 'blur(10px)',
+                pointerEvents: 'none',
+                border: isDarkMode ? '1px solid rgba(6,182,212,0.4)' : '1px solid rgba(2,132,199,0.3)',
+              }}>
+                🖱️ หมุนวัตถุ 3D อิสระ 360°
+              </div>
+
+              <div style={{ position: 'absolute', bottom: '18px', right: '18px', display: 'flex', gap: '8px', zIndex: 10 }}>
+                <button
+                  onClick={() => setZoom((z) => Math.min(z + 0.2, 1.8))}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
+                >
+                  <ZoomIn style={{ width: '18px', height: '18px' }} />
+                </button>
+                <button
+                  onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
+                >
+                  <ZoomOut style={{ width: '18px', height: '18px' }} />
+                </button>
+                <button
+                  onClick={() => { setRotation({ x: 15, y: -25 }); setZoom(1); }}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
+                >
+                  <RefreshCw style={{ width: '18px', height: '18px' }} />
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px' }}>
+              <div>
+                <p style={{ fontSize: '12px', color: theme.textSecondary, margin: 0 }}>ราคาสินค้า</p>
+                <span style={{ fontSize: '24px', fontWeight: 900, color: isDarkMode ? '#c084fc' : '#7c3aed' }}>{active3DModal.price}</span>
+              </div>
+              <button style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '14px 32px',
+                background: 'linear-gradient(135deg, #4f46e5, #9333ea)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '16px',
+                fontWeight: 800,
+                fontSize: '15px',
+                cursor: 'pointer',
+                boxShadow: '0 10px 30px rgba(99,102,241,0.5)'
+              }}>
+                <ShoppingBag style={{ width: '18px', height: '18px' }} />
+                ติดต่อสั่งซื้อทันที
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

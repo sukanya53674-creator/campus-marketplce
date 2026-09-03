@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Sparkles, Box, Flame, Eye, Layers, ArrowUpRight, Tag, Sun, Moon, 
   X, Rotate3d, ZoomIn, ZoomOut, RefreshCw, Search, Heart, ShoppingBag, ShieldCheck,
-  Compass, ArrowRight, CheckCircle2
+  Compass, ArrowRight, CheckCircle2, MessageCircle, PhoneCall
 } from 'lucide-react';
 
 interface Product {
@@ -18,6 +18,8 @@ interface Product {
   imageNight: string;
   glowColor: string;
   condition: string;
+  sellerLine?: string;
+  sellerPhone?: string;
 }
 
 interface Particle {
@@ -43,6 +45,8 @@ const PRODUCTS: Product[] = [
     imageNight: 'https://picsum.photos/id/24/600/400',
     glowColor: 'rgba(99, 102, 241, 0.45)',
     condition: 'ไฟล์ PDF / เล่มปริ้นท์',
+    sellerLine: '@campus_sheet',
+    sellerPhone: '081-234-5678',
   },
   {
     id: 2,
@@ -55,6 +59,8 @@ const PRODUCTS: Product[] = [
     imageNight: 'https://picsum.photos/id/160/600/400',
     glowColor: 'rgba(236, 72, 153, 0.45)',
     condition: 'สภาพ 85% ใช้งานได้ปกติ',
+    sellerLine: '@casio_sec',
+    sellerPhone: '082-987-6543',
   },
   {
     id: 3,
@@ -67,6 +73,8 @@ const PRODUCTS: Product[] = [
     imageNight: 'https://picsum.photos/id/0/600/400',
     glowColor: 'rgba(59, 130, 246, 0.45)',
     condition: 'ของใหม่ มือ 1',
+    sellerLine: '@gadget_campus',
+    sellerPhone: '083-456-7890',
   },
   {
     id: 4,
@@ -79,6 +87,8 @@ const PRODUCTS: Product[] = [
     imageNight: 'https://picsum.photos/id/48/600/400',
     glowColor: 'rgba(245, 158, 11, 0.45)',
     condition: 'สภาพ 95% แบตยังอึด',
+    sellerLine: '@cool_fan',
+    sellerPhone: '084-111-2233',
   },
   {
     id: 5,
@@ -91,6 +101,8 @@ const PRODUCTS: Product[] = [
     imageNight: 'https://picsum.photos/id/201/600/400',
     glowColor: 'rgba(16, 185, 129, 0.45)',
     condition: 'สภาพ 90%',
+    sellerLine: '@led_light',
+    sellerPhone: '085-555-6677',
   },
   {
     id: 6,
@@ -103,6 +115,8 @@ const PRODUCTS: Product[] = [
     imageNight: 'https://picsum.photos/id/1/600/400',
     glowColor: 'rgba(168, 85, 247, 0.45)',
     condition: 'สภาพ 80% มีรอยตามการใช้งาน',
+    sellerLine: '@monitor_2nd',
+    sellerPhone: '086-999-8877',
   },
 ];
 
@@ -124,6 +138,7 @@ export default function CampusMarketplace() {
   const particlesRef = useRef<Particle[]>([]);
 
   const [active3DModal, setActive3DModal] = useState<Product | null>(null);
+  const [orderedProduct, setOrderedProduct] = useState<Product | null>(null); // สำหรับแสดง Popup สั่งซื้อสำเร็จ
   const [rotation, setRotation] = useState<{ x: number; y: number }>({ x: 15, y: -25 });
   const [zoom, setZoom] = useState<number>(1);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -280,6 +295,11 @@ export default function CampusMarketplace() {
     setActive3DModal(product);
     setRotation({ x: 15, y: -25 });
     setZoom(1);
+  };
+
+  const handleOrder = (product: Product) => {
+    setActive3DModal(null);
+    setOrderedProduct(product);
   };
 
   const theme = {
@@ -772,6 +792,7 @@ export default function CampusMarketplace() {
         </div>
       )}
 
+      {/* 3D Interactive Viewer Modal */}
       {active3DModal && (
         <div style={{
           position: 'fixed',
@@ -1008,24 +1029,188 @@ export default function CampusMarketplace() {
                 <p style={{ fontSize: '12px', color: theme.textSecondary, margin: 0 }}>ราคาสินค้า</p>
                 <span style={{ fontSize: '26px', fontWeight: 900, color: isDarkMode ? '#38bdf8' : '#2563eb' }}>{active3DModal.price}</span>
               </div>
-              <button style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '14px 36px',
-                background: 'linear-gradient(135deg, #8b5cf6, #d946ef)',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '18px',
-                fontWeight: 800,
-                fontSize: '15px',
-                cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(217, 70, 239, 0.4)'
-              }}>
+              <button 
+                onClick={() => handleOrder(active3DModal)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '14px 36px',
+                  background: 'linear-gradient(135deg, #8b5cf6, #d946ef)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '18px',
+                  fontWeight: 800,
+                  fontSize: '15px',
+                  cursor: 'pointer',
+                  boxShadow: '0 10px 30px rgba(217, 70, 239, 0.4)'
+                }}>
                 <ShoppingBag style={{ width: '18px', height: '18px' }} />
                 ติดต่อสั่งซื้อทันที
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Confirmation Modal */}
+      {orderedProduct && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 60,
+          backgroundColor: theme.modalOverlay,
+          backdropFilter: 'blur(24px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '480px',
+            backgroundColor: isDarkMode ? '#0a0f1d' : '#ffffff',
+            borderRadius: '32px',
+            border: isDarkMode ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(16, 185, 129, 0.2)',
+            padding: '32px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            gap: '20px',
+            boxShadow: '0 0 60px rgba(16, 185, 129, 0.25)'
+          }}>
+            <button
+              onClick={() => setOrderedProduct(null)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.06)' : '#f1f5f9',
+                border: 'none',
+                color: theme.textPrimary,
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <X style={{ width: '18px', height: '18px' }} />
+            </button>
+
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              color: '#10b981',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '2px solid #10b981'
+            }}>
+              <CheckCircle2 style={{ width: '36px', height: '36px' }} />
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px 0', color: theme.textPrimary }}>
+                สั่งซื้อสำเร็จ!
+              </h3>
+              <p style={{ fontSize: '14px', color: theme.textSecondary, margin: 0 }}>
+                กรุณาติดต่อผู้ขายโดยตรงผ่านช่องทางด้านล่างนี้
+              </p>
+            </div>
+
+            <div style={{
+              width: '100%',
+              backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#f8fafc',
+              border: `1px solid ${theme.border}`,
+              borderRadius: '20px',
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              textAlign: 'left'
+            }}>
+              <img 
+                src={isDarkMode ? orderedProduct.imageNight : orderedProduct.imageDay} 
+                alt={orderedProduct.title} 
+                style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover' }}
+              />
+              <div style={{ flex: 1, overflow: 'hidden' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 4px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {orderedProduct.title}
+                </h4>
+                <span style={{ fontSize: '16px', fontWeight: 900, color: '#10b981' }}>
+                  {orderedProduct.price}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {orderedProduct.sellerLine && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 18px',
+                  borderRadius: '16px',
+                  backgroundColor: isDarkMode ? '#06c75520' : '#e6f9ed',
+                  border: '1px solid #06c755',
+                  color: '#06c755',
+                  fontWeight: 700,
+                  fontSize: '14px'
+                }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <MessageCircle style={{ width: '18px', height: '18px' }} /> Line ID
+                  </span>
+                  <span>{orderedProduct.sellerLine}</span>
+                </div>
+              )}
+
+              {orderedProduct.sellerPhone && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 18px',
+                  borderRadius: '16px',
+                  backgroundColor: isDarkMode ? 'rgba(56, 189, 248, 0.15)' : '#e0f2fe',
+                  border: '1px solid #38bdf8',
+                  color: isDarkMode ? '#38bdf8' : '#0284c7',
+                  fontWeight: 700,
+                  fontSize: '14px'
+                }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <PhoneCall style={{ width: '18px', height: '18px' }} /> เบอร์โทรศัพท์
+                  </span>
+                  <span>{orderedProduct.sellerPhone}</span>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setOrderedProduct(null)}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                color: '#ffffff',
+                border: 'none',
+                fontWeight: 800,
+                fontSize: '15px',
+                cursor: 'pointer',
+                marginTop: '6px',
+                boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)'
+              }}
+            >
+              รับทราบ / ตกลง
+            </button>
           </div>
         </div>
       )}

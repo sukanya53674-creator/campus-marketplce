@@ -19,6 +19,17 @@ interface Product {
   condition: string;
 }
 
+interface Particle {
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+  vx: number;
+  vy: number;
+  alpha: number;
+  life: number;
+}
+
 const PRODUCTS: Product[] = [
   {
     id: 1,
@@ -94,6 +105,8 @@ const PRODUCTS: Product[] = [
   },
 ];
 
+const TRAIL_COLORS = ['#38bdf8', '#818cf8', '#c084fc', '#f472b6', '#34d399'];
+
 export default function ProductPage() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<'all' | '3d' | 'hot'>('all');
@@ -105,32 +118,106 @@ export default function ProductPage() {
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
   const [trailPos, setTrailPos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
 
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const particlesRef = useRef<Particle[]>([]);
+
   const [active3DModal, setActive3DModal] = useState<Product | null>(null);
   const [rotation, setRotation] = useState<{ x: number; y: number }>({ x: 15, y: -25 });
   const [zoom, setZoom] = useState<number>(1);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
+  // Mouse Listener & Particle Generator
   useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => {
+    let colorIdx = 0;
+    const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
+
+      // Generate particles on mouse move
+      for (let i = 0; i < 2; i++) {
+        particlesRef.current.push({
+          x: e.clientX,
+          y: e.clientY,
+          size: Math.random() * 4 + 2,
+          color: TRAIL_COLORS[colorIdx % TRAIL_COLORS.length],
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: (Math.random() - 0.5) * 1.5 - 0.5,
+          alpha: 1,
+          life: 1,
+        });
+        colorIdx++;
+      }
     };
-    window.addEventListener('mousemove', handleGlobalMouseMove);
-    return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  // Smooth Pointer Circle Following
   useEffect(() => {
     let animationFrameId: number;
     const updateTrail = () => {
       setTrailPos((prev) => ({
-        x: prev.x + (mousePos.x - prev.x) * 0.15,
-        y: prev.y + (mousePos.y - prev.y) * 0.15,
+        x: prev.x + (mousePos.x - prev.x) * 0.18,
+        y: prev.y + (mousePos.y - prev.y) * 0.18,
       }));
       animationFrameId = requestAnimationFrame(updateTrail);
     };
     animationFrameId = requestAnimationFrame(updateTrail);
     return () => cancelAnimationFrame(animationFrameId);
   }, [mousePos]);
+
+  // Particle Canvas Animation Loop
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const render = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particlesRef.current.forEach((p, idx) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.025;
+        p.alpha = Math.max(0, p.life);
+
+        if (p.life <= 0) {
+          particlesRef.current.splice(idx, 1);
+          return;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animId);
+    };
+  }, []);
 
   const toggleFavorite = (id: number, e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -212,34 +299,62 @@ export default function ProductPage() {
   return (
     <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '32px 24px', color: theme.textPrimary, fontFamily: "'Inter', sans-serif", position: 'relative', overflow: 'hidden' }}>
       
-      {/* Background Glow */}
+      {/* Dynamic Particle Canvas (ละอองดาววิ่งตามเมาส์) */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          pointerEvents: 'none',
+          zIndex: 9998,
+        }}
+      />
+
+      {/* Multi-Color Gradient Ambient Glow Background */}
       <div style={{
         pointerEvents: 'none',
         position: 'fixed',
         inset: 0,
         zIndex: 1,
-        background: `radial-gradient(700px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(56, 189, 248, 0.12)' : 'rgba(99, 102, 241, 0.08)'}, transparent 80%)`,
+        background: `radial-gradient(500px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(56, 189, 248, 0.15)' : 'rgba(99, 102, 241, 0.1)'}, rgba(168, 85, 247, 0.05) 50%, transparent 80%)`,
       }} />
 
-      {/* Cursor Follower */}
+      {/* Main Cursor Ring */}
       <div style={{
         pointerEvents: 'none',
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '32px',
-        height: '32px',
+        width: '36px',
+        height: '36px',
         borderRadius: '50%',
-        border: '1.5px solid rgba(56, 189, 248, 0.6)',
-        transform: `translate(${trailPos.x - 16}px, ${trailPos.y - 16}px)`,
+        border: '2px solid transparent',
+        backgroundImage: 'linear-gradient(#030712, #030712), linear-gradient(135deg, #38bdf8, #c084fc, #f472b6)',
+        backgroundOrigin: 'border-box',
+        backgroundClip: 'padding-box, border-box',
+        transform: `translate(${trailPos.x - 18}px, ${trailPos.y - 18}px)`,
         zIndex: 9999,
-        backdropFilter: 'blur(1px)',
-        transition: 'width 0.2s, height 0.2s',
+        boxShadow: '0 0 15px rgba(56, 189, 248, 0.4)',
+      }} />
+
+      {/* Center Precision Pointer Dot */}
+      <div style={{
+        pointerEvents: 'none',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        background: 'linear-gradient(135deg, #38bdf8, #f472b6)',
+        transform: `translate(${mousePos.x - 4}px, ${mousePos.y - 4}px)`,
+        zIndex: 10000,
+        boxShadow: '0 0 10px #38bdf8',
       }} />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px', position: 'relative', zIndex: 2 }}>
         
-        {/* Navigation & Controls */}
+        {/* Navigation Bar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{
             display: 'flex',
@@ -370,7 +485,7 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Section Header */}
+        {/* Header Title */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', fontWeight: 800, margin: 0 }}>
             <Sparkles style={{ width: '20px', height: '20px', color: '#38bdf8' }} />
@@ -381,7 +496,7 @@ export default function ProductPage() {
           </span>
         </div>
 
-        {/* Product Cards Grid */}
+        {/* Product Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '24px', perspective: '1200px' }}>
           {filteredProducts.map((item) => {
             const state = cardState[item.id] || { x: 0, y: 0, mouseX: 0, mouseY: 0 };
@@ -525,7 +640,7 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* ULTRA-MODERN CYBERPUNK 3D VIEWERS MODAL */}
+      {/* 3D MODAL */}
       {active3DModal && (
         <div style={{
           position: 'fixed',
@@ -551,7 +666,6 @@ export default function ProductPage() {
             gap: '20px',
             boxShadow: isDarkMode ? '0 0 80px rgba(6, 182, 212, 0.25)' : '0 30px 60px rgba(0,0,0,0.15)'
           }}>
-            {/* Modal Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
@@ -591,7 +705,6 @@ export default function ProductPage() {
               </button>
             </div>
 
-            {/* 3D Canvas Area */}
             <div
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
@@ -613,7 +726,6 @@ export default function ProductPage() {
                 border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.05)' : 'none'
               }}
             >
-              {/* Grid Background Lines */}
               <div style={{
                 position: 'absolute',
                 inset: 0,
@@ -624,17 +736,6 @@ export default function ProductPage() {
                 pointerEvents: 'none'
               }} />
 
-              {/* Top Cyber Light Flare */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                width: '60%',
-                height: '2px',
-                background: 'linear-gradient(90deg, transparent, #06b6d4, #3b82f6, transparent)',
-                boxShadow: '0 0 15px #06b6d4'
-              }} />
-
-              {/* Main 3D Model Stage Wrapper */}
               <div style={{
                 transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${zoom})`,
                 transformStyle: 'preserve-3d',
@@ -647,7 +748,6 @@ export default function ProductPage() {
                 height: '240px'
               }}>
 
-                {/* Cyber Hologram Outer Ring 1 */}
                 <div style={{
                   position: 'absolute',
                   bottom: '-80px',
@@ -660,7 +760,6 @@ export default function ProductPage() {
                   pointerEvents: 'none'
                 }} />
 
-                {/* Cyber Hologram Inner Solid Ring 2 */}
                 <div style={{
                   position: 'absolute',
                   bottom: '-80px',
@@ -674,32 +773,6 @@ export default function ProductPage() {
                   pointerEvents: 'none'
                 }} />
 
-                {/* Laser Ray Column Effects */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: '-80px',
-                  width: '260px',
-                  height: '220px',
-                  background: 'linear-gradient(to top, rgba(6, 182, 212, 0.25), transparent)',
-                  transform: 'rotateX(0deg) translateZ(-50px)',
-                  pointerEvents: 'none',
-                  clipPath: 'polygon(15% 100%, 85% 100%, 100% 0, 0 0)'
-                }} />
-
-                {/* Dynamic Shadow Layer */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: '-50px',
-                  width: '260px',
-                  height: '80px',
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                  filter: 'blur(18px)',
-                  transform: `rotateX(90deg) translateZ(-70px) translateX(${-rotation.y * 0.8}px)`,
-                  pointerEvents: 'none'
-                }} />
-
-                {/* Layer 1: Backing Frame Plate */}
                 <div style={{
                   position: 'absolute',
                   inset: 0,
@@ -710,18 +783,6 @@ export default function ProductPage() {
                   boxShadow: '0 0 30px rgba(0, 0, 0, 0.9)'
                 }} />
 
-                {/* Layer 2: Glassmorphic Middle Frame */}
-                <div style={{
-                  position: 'absolute',
-                  inset: '-6px',
-                  borderRadius: '26px',
-                  border: '2px solid rgba(56, 189, 248, 0.5)',
-                  background: 'rgba(15, 23, 42, 0.3)',
-                  backdropFilter: 'blur(4px)',
-                  transform: 'translateZ(-8px)'
-                }} />
-
-                {/* Layer 3: Main High-Tech Canvas Image */}
                 <div style={{
                   position: 'absolute',
                   inset: 0,
@@ -741,17 +802,8 @@ export default function ProductPage() {
                       objectFit: 'cover'
                     }}
                   />
-
-                  {/* High Gloss Ray Sweep Effect */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: `linear-gradient(${120 + rotation.y * 1.5}deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.1) 100%)`,
-                    pointerEvents: 'none'
-                  }} />
                 </div>
 
-                {/* Floating Tech Badge (Top Left - Depth 50px) */}
                 <div style={{
                   position: 'absolute',
                   top: '-18px',
@@ -774,24 +826,6 @@ export default function ProductPage() {
                   {active3DModal.condition}
                 </div>
 
-                {/* Floating Category Badge (Top Right - Depth 60px) */}
-                <div style={{
-                  position: 'absolute',
-                  top: '-18px',
-                  right: '-18px',
-                  background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
-                  color: '#ffffff',
-                  padding: '6px 14px',
-                  borderRadius: '12px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  transform: 'translateZ(60px)',
-                  boxShadow: '0 10px 25px rgba(59, 130, 246, 0.5)',
-                }}>
-                  {active3DModal.category}
-                </div>
-
-                {/* Floating Glass Price Tag (Bottom Right - Depth 75px) */}
                 <div style={{
                   position: 'absolute',
                   bottom: '-20px',
@@ -816,52 +850,28 @@ export default function ProductPage() {
 
               </div>
 
-              {/* Floating Instruction Banner */}
-              <div style={{
-                position: 'absolute',
-                bottom: '18px',
-                left: '18px',
-                backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.9)',
-                color: isDarkMode ? '#38bdf8' : '#0284c7',
-                fontSize: '12px',
-                fontWeight: 700,
-                padding: '8px 16px',
-                borderRadius: '20px',
-                backdropFilter: 'blur(12px)',
-                pointerEvents: 'none',
-                border: isDarkMode ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(2, 132, 199, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 8px #10b981' }} />
-                คลิกค้างเพื่อหมุนมุมมอง 3D อิสระ 360°
-              </div>
-
-              {/* Floating Controls */}
               <div style={{ position: 'absolute', bottom: '18px', right: '18px', display: 'flex', gap: '8px', zIndex: 10 }}>
                 <button
                   onClick={() => setZoom((z) => Math.min(z + 0.2, 1.8))}
-                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer', backdropFilter: 'blur(8px)' }}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
                 >
                   <ZoomIn style={{ width: '18px', height: '18px' }} />
                 </button>
                 <button
                   onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
-                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer', backdropFilter: 'blur(8px)' }}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
                 >
                   <ZoomOut style={{ width: '18px', height: '18px' }} />
                 </button>
                 <button
                   onClick={() => { setRotation({ x: 15, y: -25 }); setZoom(1); }}
-                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer', backdropFilter: 'blur(8px)' }}
+                  style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
                 >
                   <RefreshCw style={{ width: '18px', height: '18px' }} />
                 </button>
               </div>
             </div>
 
-            {/* Modal Bottom Action Bar */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px' }}>
               <div>
                 <p style={{ fontSize: '12px', color: theme.textSecondary, margin: 0 }}>ยอดรวมสุทธิ</p>

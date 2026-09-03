@@ -127,13 +127,11 @@ export default function ProductPage() {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  // Mouse Listener & Particle Generator
   useEffect(() => {
     let colorIdx = 0;
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
 
-      // Generate particles on mouse move
       for (let i = 0; i < 2; i++) {
         particlesRef.current.push({
           x: e.clientX,
@@ -153,7 +151,6 @@ export default function ProductPage() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Smooth Pointer Circle Following
   useEffect(() => {
     let animationFrameId: number;
     const updateTrail = () => {
@@ -167,7 +164,6 @@ export default function ProductPage() {
     return () => cancelAnimationFrame(animationFrameId);
   }, [mousePos]);
 
-  // Particle Canvas Animation Loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -299,7 +295,6 @@ export default function ProductPage() {
   return (
     <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '32px 24px', color: theme.textPrimary, fontFamily: "'Inter', sans-serif", position: 'relative', overflow: 'hidden' }}>
       
-      {/* Dynamic Particle Canvas (ละอองดาววิ่งตามเมาส์) */}
       <canvas
         ref={canvasRef}
         style={{
@@ -310,7 +305,6 @@ export default function ProductPage() {
         }}
       />
 
-      {/* Multi-Color Gradient Ambient Glow Background */}
       <div style={{
         pointerEvents: 'none',
         position: 'fixed',
@@ -319,7 +313,6 @@ export default function ProductPage() {
         background: `radial-gradient(500px circle at ${mousePos.x}px ${mousePos.y}px, ${isDarkMode ? 'rgba(56, 189, 248, 0.15)' : 'rgba(99, 102, 241, 0.1)'}, rgba(168, 85, 247, 0.05) 50%, transparent 80%)`,
       }} />
 
-      {/* Main Cursor Ring */}
       <div style={{
         pointerEvents: 'none',
         position: 'fixed',
@@ -337,7 +330,6 @@ export default function ProductPage() {
         boxShadow: '0 0 15px rgba(56, 189, 248, 0.4)',
       }} />
 
-      {/* Center Precision Pointer Dot */}
       <div style={{
         pointerEvents: 'none',
         position: 'fixed',
@@ -354,7 +346,6 @@ export default function ProductPage() {
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px', position: 'relative', zIndex: 2 }}>
         
-        {/* Navigation Bar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{
             display: 'flex',
@@ -485,7 +476,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Header Title */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', fontWeight: 800, margin: 0 }}>
             <Sparkles style={{ width: '20px', height: '20px', color: '#38bdf8' }} />
@@ -496,7 +486,6 @@ export default function ProductPage() {
           </span>
         </div>
 
-        {/* Product Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '24px', perspective: '1200px' }}>
           {filteredProducts.map((item) => {
             const state = cardState[item.id] || { x: 0, y: 0, mouseX: 0, mouseY: 0 };
@@ -640,7 +629,6 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* 3D MODAL */}
       {active3DModal && (
         <div style={{
           position: 'fixed',

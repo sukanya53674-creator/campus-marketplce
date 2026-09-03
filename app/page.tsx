@@ -102,12 +102,11 @@ export default function ProductPage() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [cardState, setCardState] = useState<{ [key: number]: { x: number; y: number; mouseX: number; mouseY: number } }>({});
 
-  // Cursor Trail Effects
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
   const [trailPos, setTrailPos] = useState<{ x: number; y: number }>({ x: -1000, y: -1000 });
 
   const [active3DModal, setActive3DModal] = useState<Product | null>(null);
-  const [rotation, setRotation] = useState<{ x: number; y: number }>({ x: 15, y: -25 });
+  const [rotation, setRotation] = useState<{ x: number; y: number }>({ x: 20, y: -30 });
   const [zoom, setZoom] = useState<number>(1);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const dragStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -120,7 +119,6 @@ export default function ProductPage() {
     return () => window.removeEventListener('mousemove', handleGlobalMouseMove);
   }, []);
 
-  // Smooth Smooth Motion for Trail Effect
   useEffect(() => {
     let animationFrameId: number;
     const updateTrail = () => {
@@ -184,7 +182,7 @@ export default function ProductPage() {
     const deltaY = e.clientY - dragStart.current.y;
 
     setRotation((prev) => ({
-      x: Math.max(-60, Math.min(60, prev.x - deltaY * 0.5)),
+      x: Math.max(-75, Math.min(75, prev.x - deltaY * 0.6)),
       y: prev.y + deltaX * 0.8,
     }));
 
@@ -195,7 +193,7 @@ export default function ProductPage() {
 
   const open3DModal = (product: Product) => {
     setActive3DModal(product);
-    setRotation({ x: 15, y: -25 });
+    setRotation({ x: 20, y: -30 });
     setZoom(1);
   };
 
@@ -208,14 +206,13 @@ export default function ProductPage() {
     borderHover: isDarkMode ? '#818cf8' : '#6366f1',
     dockBg: isDarkMode ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
     shadow: isDarkMode ? '0 20px 50px rgba(0,0,0,0.8)' : '0 10px 30px rgba(0,0,0,0.05)',
-    modalOverlay: isDarkMode ? 'rgba(3, 7, 18, 0.85)' : 'rgba(255, 255, 255, 0.85)',
-    gridColor: isDarkMode ? 'rgba(99,102,241,0.15)' : 'rgba(99,102,241,0.08)',
+    modalOverlay: isDarkMode ? 'rgba(3, 7, 18, 0.88)' : 'rgba(255, 255, 255, 0.88)',
+    gridColor: isDarkMode ? 'rgba(99,102,241,0.2)' : 'rgba(99,102,241,0.1)',
   };
 
   return (
     <div style={{ backgroundColor: theme.bg, minHeight: '100vh', padding: '32px 24px', color: theme.textPrimary, fontFamily: "'Inter', sans-serif", transition: 'background-color 0.4s ease', position: 'relative', overflow: 'hidden' }}>
       
-      {/* 1. Light Glow Follower (ใหญ่ นุ่มนวล) */}
       <div
         style={{
           pointerEvents: 'none',
@@ -226,7 +223,6 @@ export default function ProductPage() {
         }}
       />
 
-      {/* 2. Dynamic Cursor Smooth Trail Effect (วงแหวนวิ่งตามแบบนุ่มนวล) */}
       <div
         style={{
           pointerEvents: 'none',
@@ -246,7 +242,6 @@ export default function ProductPage() {
         }}
       />
 
-      {/* 3. Center Glow Dot (จุดตรงปลายเมาส์) */}
       <div
         style={{
           pointerEvents: 'none',
@@ -264,8 +259,6 @@ export default function ProductPage() {
       />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px', position: 'relative', zIndex: 2 }}>
-        
-        {/* Navigation & Controls */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{
             display: 'flex',
@@ -396,7 +389,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Section Title */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px', fontWeight: 800, margin: 0 }}>
             <Sparkles style={{ width: '20px', height: '20px', color: '#6366f1' }} />
@@ -407,7 +399,6 @@ export default function ProductPage() {
           </span>
         </div>
 
-        {/* Product Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '24px', perspective: '1200px' }}>
           {filteredProducts.map((item) => {
             const state = cardState[item.id] || { x: 0, y: 0, mouseX: 0, mouseY: 0 };
@@ -551,7 +542,7 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* 3D INTERACTIVE MODAL */}
+      {/* 3D INTERACTIVE MODAL (ENHANCED 3D DEPTH) */}
       {active3DModal && (
         <div style={{
           position: 'fixed',
@@ -567,7 +558,7 @@ export default function ProductPage() {
           <div style={{
             position: 'relative',
             width: '100%',
-            maxWidth: '720px',
+            maxWidth: '760px',
             backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
             borderRadius: '32px',
             border: `1px solid ${theme.border}`,
@@ -575,13 +566,13 @@ export default function ProductPage() {
             display: 'flex',
             flexDirection: 'column',
             gap: '20px',
-            boxShadow: theme.shadow
+            boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.5)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Rotate3d style={{ width: '24px', height: '24px', color: '#06b6d4' }} />
                 <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: theme.textPrimary }}>
-                  3D Interactive Viewer: {active3DModal.title}
+                  3D Perspective Viewer: {active3DModal.title}
                 </h3>
               </div>
               <button
@@ -611,14 +602,14 @@ export default function ProductPage() {
               style={{
                 position: 'relative',
                 width: '100%',
-                height: '420px',
+                height: '440px',
                 borderRadius: '24px',
                 overflow: 'hidden',
                 backgroundColor: isDarkMode ? '#020617' : '#f8fafc',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                perspective: '1000px',
+                perspective: '800px',
                 cursor: isDragging ? 'grabbing' : 'grab',
                 userSelect: 'none'
               }}
@@ -632,7 +623,7 @@ export default function ProductPage() {
                 pointerEvents: 'none'
               }} />
 
-              {/* 3D Platform & Shadow Canvas */}
+              {/* 3D Box Container */}
               <div style={{
                 transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${zoom})`,
                 transformStyle: 'preserve-3d',
@@ -640,52 +631,128 @@ export default function ProductPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative'
+                position: 'relative',
+                width: '280px',
+                height: '220px'
               }}>
-                {/* Floor Pedestal Base */}
+                
+                {/* 1. Floor Base Pedestal (ฐานวงกลมรองรับสินค้า) */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '-50px',
-                  width: '280px',
-                  height: '280px',
+                  bottom: '-60px',
+                  width: '320px',
+                  height: '320px',
                   borderRadius: '50%',
                   background: isDarkMode 
-                    ? 'radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(15, 23, 42, 0) 70%)'
+                    ? 'radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(15, 23, 42, 0) 70%)'
                     : 'radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(255, 255, 255, 0) 70%)',
-                  transform: 'rotateX(80deg) translateZ(-60px)',
-                  border: isDarkMode ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid rgba(99, 102, 241, 0.15)',
+                  transform: 'rotateX(90deg) translateZ(-80px)',
+                  border: isDarkMode ? '2px solid rgba(99, 102, 241, 0.4)' : '2px solid rgba(99, 102, 241, 0.2)',
+                  boxShadow: '0 0 30px rgba(99, 102, 241, 0.3)',
                   pointerEvents: 'none'
                 }} />
 
-                {/* Floor Dynamic Shadow */}
+                {/* 2. Soft Dynamic Shadow (เงาตามการหมุน) */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '-35px',
-                  width: '240px',
-                  height: '45px',
+                  bottom: '-40px',
+                  width: '260px',
+                  height: '60px',
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                  filter: 'blur(14px)',
-                  transform: `rotateX(75deg) translateZ(-40px) translateX(${-rotation.y * 0.8}px)`,
-                  opacity: Math.max(0.3, 1 - Math.abs(rotation.x) / 90),
+                  backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                  filter: 'blur(16px)',
+                  transform: `rotateX(80deg) translateZ(-60px) translateX(${-rotation.y * 0.9}px)`,
+                  opacity: Math.max(0.2, 1 - Math.abs(rotation.x) / 90),
                   pointerEvents: 'none'
                 }} />
 
-                {/* 3D Image Object */}
-                <img
-                  src={isDarkMode ? active3DModal.imageNight : active3DModal.imageDay}
-                  alt={active3DModal.title}
-                  draggable={false}
-                  style={{
-                    maxWidth: '280px',
-                    maxHeight: '280px',
-                    objectFit: 'cover',
-                    borderRadius: '22px',
-                    transform: 'translateZ(25px)',
-                    border: isDarkMode ? '2px solid rgba(255, 255, 255, 0.35)' : '2px solid rgba(255, 255, 255, 0.9)',
-                    boxShadow: `${-rotation.y * 0.6}px ${rotation.x * 0.6 + 20}px 35px rgba(0, 0, 0, 0.65), 0 0 25px ${active3DModal.glowColor}`,
-                  }}
-                />
+                {/* 3. 3D Thick Back Layer (แผ่นหลังเพื่อสร้างความหนา) */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '20px',
+                  backgroundColor: isDarkMode ? '#1e1b4b' : '#cbd5e1',
+                  transform: 'translateZ(-15px)',
+                  boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.8)'
+                }} />
+
+                {/* 4. 3D Side Frame / Extrusion (ขอบข้างสร้างมิติ) */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '20px',
+                  border: '14px solid rgba(99, 102, 241, 0.3)',
+                  transform: 'translateZ(-5px)',
+                  filter: 'blur(2px)',
+                }} />
+
+                {/* 5. Main Image Layer (รูปภาพสินค้าหลัก) */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  transform: 'translateZ(10px)',
+                  border: isDarkMode ? '2px solid rgba(255, 255, 255, 0.4)' : '2px solid rgba(255, 255, 255, 0.9)',
+                  boxShadow: `${-rotation.y * 0.7}px ${rotation.x * 0.7 + 15}px 30px rgba(0, 0, 0, 0.7), 0 0 25px ${active3DModal.glowColor}`,
+                }}>
+                  <img
+                    src={isDarkMode ? active3DModal.imageNight : active3DModal.imageDay}
+                    alt={active3DModal.title}
+                    draggable={false}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                  {/* Glossy Reflection Highlight (แสงสะท้อนผิวมันวาว) */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: `linear-gradient(${135 + rotation.y}deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 50%)`,
+                    pointerEvents: 'none'
+                  }} />
+                </div>
+
+                {/* 6. Floating Glass Tag (ป้ายหมอยื่นลอยออกมาข้างหน้า) */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-15px',
+                  right: '-15px',
+                  backgroundColor: 'rgba(99, 102, 241, 0.9)',
+                  color: '#ffffff',
+                  padding: '6px 14px',
+                  borderRadius: '12px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  transform: 'translateZ(45px)',
+                  boxShadow: '0 10px 20px rgba(0, 0, 0, 0.4)',
+                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  backdropFilter: 'blur(8px)'
+                }}>
+                  ✨ {active3DModal.category}
+                </div>
+
+                {/* 7. Floating Price Tag (ป้ายราคาลอยระดับหน้าสุด) */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-15px',
+                  left: '-15px',
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                  color: '#38bdf8',
+                  padding: '8px 16px',
+                  borderRadius: '14px',
+                  fontSize: '13px',
+                  fontWeight: 900,
+                  transform: 'translateZ(55px)',
+                  boxShadow: '0 12px 25px rgba(0, 0, 0, 0.5)',
+                  border: '1px solid rgba(56, 189, 248, 0.5)',
+                  backdropFilter: 'blur(8px)'
+                }}>
+                  {active3DModal.price}
+                </div>
+
               </div>
 
               <div style={{
@@ -702,7 +769,7 @@ export default function ProductPage() {
                 pointerEvents: 'none',
                 border: isDarkMode ? '1px solid rgba(6,182,212,0.4)' : '1px solid rgba(2,132,199,0.3)',
               }}>
-                🖱️ หมุนวัตถุ 3D อิสระ 360°
+                🖱️ คลิกค้างเพื่อหมุนวัตถุแบบ Multi-layer Depth 3D
               </div>
 
               <div style={{ position: 'absolute', bottom: '18px', right: '18px', display: 'flex', gap: '8px', zIndex: 10 }}>
@@ -719,7 +786,7 @@ export default function ProductPage() {
                   <ZoomOut style={{ width: '18px', height: '18px' }} />
                 </button>
                 <button
-                  onClick={() => { setRotation({ x: 15, y: -25 }); setZoom(1); }}
+                  onClick={() => { setRotation({ x: 20, y: -30 }); setZoom(1); }}
                   style={{ padding: '10px', borderRadius: '12px', backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255,255,255,0.9)', border: `1px solid ${theme.border}`, color: theme.textPrimary, cursor: 'pointer' }}
                 >
                   <RefreshCw style={{ width: '18px', height: '18px' }} />
